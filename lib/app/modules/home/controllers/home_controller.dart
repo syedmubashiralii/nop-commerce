@@ -8,7 +8,7 @@ class HomeController extends GetxController {
   var currentPage = 0.obs;
   late PageController pageController; // Declare PageController
 
-  var authController = Get.find<AuthController>();
+  var authenticationController = Get.find<AuthenticationController>();
 
   @override
   void onInit() {

@@ -4,7 +4,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:nop_commerce/app/modules/home/models/token_model.dart';
 
-class AuthController extends GetxController {
+class AuthenticationController extends GetxController {
   var isLoading = false.obs;
   var authModel = TokenModel().obs;
   String baseUrl = "https://mobiledemo.herohero.store";
