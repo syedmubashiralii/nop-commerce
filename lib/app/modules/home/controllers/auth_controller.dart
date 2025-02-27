@@ -1,7 +1,6 @@
-import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:http/http.dart' as http;
 import 'package:nop_commerce/app/modules/home/models/token_model.dart';
 
 class AuthenticationController extends GetxController {
@@ -14,6 +13,7 @@ class AuthenticationController extends GetxController {
   var customerGuid = "".obs;
 
   final storage = GetStorage();
+  final Dio dio = Dio();
 
   @override
   void onInit() {
@@ -21,7 +21,6 @@ class AuthenticationController extends GetxController {
     _checkStoredToken();
   }
 
-  // Check if token is stored in local storage
   // ✅ Check if token exists in storage, otherwise fetch it
   void _checkStoredToken() {
     if (storage.hasData('access_token') && storage.hasData('customer_guid')) {
@@ -33,26 +32,28 @@ class AuthenticationController extends GetxController {
     }
   }
 
-  // ✅ Fetch token from API
+  // ✅ Fetch token from API using Dio
   Future<void> getToken() async {
     String url = "$baseUrl/token";
     try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          // 'Authorization': 'Bearer YOUR_BEARER_TOKEN'
-        },
-        body: jsonEncode({
+      final response = await dio.post(
+        url,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            // 'Authorization': 'Bearer YOUR_BEARER_TOKEN'
+          },
+        ),
+        data: {
           "guest": "true",
           "username": "",
           "password": "",
           "remember_me": "true"
-        }),
+        },
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final data = response.data;
         TokenModel tokenModel = TokenModel.fromJson(data);
 
         // Save in GetStorage
@@ -65,7 +66,7 @@ class AuthenticationController extends GetxController {
 
         print("New Token Fetched and Saved: ${tokenModel.accessToken}");
       } else {
-        print("Failed to fetch token: ${response.body}");
+        print("Failed to fetch token: ${response.statusCode}");
       }
     } catch (e) {
       print("Error fetching token: $e");

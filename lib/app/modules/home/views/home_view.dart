@@ -98,9 +98,9 @@ class HomeMenuScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSlider(), // ✅ Add Slider at the top
-            SizedBox(height: 20), // 🛠 Add spacing for better UI
+            const SizedBox(height: 20), // 🛠 Add spacing for better UI
             categoriesWidgets(), // ✅ Add Categories section
-            SizedBox(height: 20), // 🛠 Add spacing for better UI
+            const SizedBox(height: 20), // 🛠 Add spacing for better UI
             _topProducts(),
           ],
         ),
@@ -183,7 +183,7 @@ class HomeMenuScreen extends StatelessWidget {
         ));
   }
 
-  /// ✅ **Categories Widget**
+  /// ✅ **Updated Categories Widget using Real API Data**
   Widget categoriesWidgets() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: Get.width * 0.04),
@@ -223,7 +223,7 @@ class HomeMenuScreen extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: Get.width * 0.04,
+                  crossAxisSpacing: Get.width * 0.033,
                   mainAxisSpacing: Get.height * 0.02,
                   childAspectRatio: 1,
                 ),
@@ -246,40 +246,45 @@ class HomeMenuScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(4),
                       child: Column(
                         children: [
-                          // 🛠 **Updated Grid to 4 images instead of 2**
                           Expanded(
-                            child: GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 5,
-                                mainAxisSpacing: 5,
-                              ),
-                              itemCount: category['images'].length >= 4
-                                  ? 4
-                                  : category['images'].length,
-                              itemBuilder: (context, imgIndex) {
-                                return ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.asset(
-                                    category['images'][imgIndex],
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: FadeInImage.assetNetwork(
+                                placeholder:
+                                    'assets/images/loading.gif', // Placeholder while loading
+                                image: category.image.src,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                imageErrorBuilder:
+                                    (context, error, stackTrace) {
+                                  return Image.asset(
+                                    'assets/images/placeholder.jpg',
                                     fit: BoxFit.cover,
-                                  ),
-                                );
-                              },
+                                    width: double.infinity,
+                                  );
+                                },
+                              ),
                             ),
                           ),
+                          // Expanded(
+                          //   child: ClipRRect(
+                          //     borderRadius: BorderRadius.circular(10),
+                          //     child: Image.network(
+                          //       category.image.src,
+                          //       fit: BoxFit.cover,
+                          //       width: double.infinity,
+                          //     ),
+                          //   ),
+                          // ),
                           Padding(
                             padding: EdgeInsets.all(Get.width * 0.02),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  category['title'],
+                                  category.name,
                                   style: TextStyle(
-                                    fontSize: Get.width * 0.045,
+                                    fontSize: Get.width * 0.043,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -291,7 +296,7 @@ class HomeMenuScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Text(
-                                    category['count'].toString(),
+                                    "${category.id}", // Dummy count placeholder
                                     style: TextStyle(
                                       fontSize: Get.width * 0.04,
                                       fontWeight: FontWeight.bold,
