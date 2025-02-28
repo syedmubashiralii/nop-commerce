@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nop_commerce/app/modules/home/controllers/home_controller.dart';
+import 'package:nop_commerce/app/modules/home/models/product_model.dart';
 
 class HomeView extends GetView<HomeController> {
   HomeView({super.key});
@@ -18,41 +19,54 @@ class HomeView extends GetView<HomeController> {
     const Center(child: Text("Profile")),
   ];
 
+  // Icons
+  final List<String> iconPaths = [
+    'assets/icons/shop.png',
+    'assets/icons/favorite.png',
+    'assets/icons/categories.png',
+    'assets/icons/cart.png',
+    'assets/icons/profile.png',
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(child: Obx(() => screens[controller.selectedIndex.value])),
-      bottomNavigationBar: Obx(() => BottomNavigationBar(
-            currentIndex: controller.selectedIndex.value,
-            onTap: controller.changeIndex,
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: Colors.black,
-            unselectedItemColor: Colors.blue,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home, size: Get.width * 0.07),
-                label: 'Home',
+      resizeToAvoidBottomInset: false, // Prevents bottom bar from moving up
+      bottomNavigationBar: customBottomBar(),
+      body: Obx(() => screens[controller.selectedIndex.value]),
+    );
+  }
+
+  Obx customBottomBar() {
+    return Obx(
+      () => Container(
+        padding: EdgeInsets.symmetric(vertical: Get.height * 0.015),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 5,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: List.generate(iconPaths.length, (index) {
+            return GestureDetector(
+              onTap: () => controller.changeIndex(index),
+              child: Image.asset(
+                iconPaths[index],
+                width: Get.width * 0.07,
+                color: controller.selectedIndex.value == index
+                    ? Colors.black
+                    : const Color.fromARGB(255, 0, 76, 255),
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.favorite_border, size: Get.width * 0.07),
-                label: 'Favorites',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.article_outlined, size: Get.width * 0.07),
-                label: 'Orders',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_bag_outlined, size: Get.width * 0.07),
-                label: 'Cart',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline, size: Get.width * 0.07),
-                label: 'Profile',
-              ),
-            ],
-          )),
+            );
+          }),
+        ),
+      ),
     );
   }
 }
@@ -100,8 +114,34 @@ class HomeMenuScreen extends StatelessWidget {
             _buildSlider(), // ✅ Add Slider at the top
             const SizedBox(height: 20), // 🛠 Add spacing for better UI
             categoriesWidgets(), // ✅ Add Categories section
-            const SizedBox(height: 20), // 🛠 Add spacing for better UI
-            _topProducts(),
+            const SizedBox(height: 10), // 🛠 Add spacing for better UI
+            _allItemsHeader(), // ✅ Add "All Items" header
+            const SizedBox(height: 15), // 🛠 Add spacing for better UI
+            Obx(
+              () => controller.isLoading.value
+                  ? const Center(child: CircularProgressIndicator())
+                  : GridView.builder(
+                      shrinkWrap: true, // Prevents infinite height issues
+                      physics:
+                          const NeverScrollableScrollPhysics(), // Disables GridView's scrolling
+                      itemCount: controller.productList
+                          .where((p) => p.showOnHomePage == true)
+                          .length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: Get.width > 600 ? 3 : 2,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 0.7,
+                      ),
+                      itemBuilder: (context, index) {
+                        final products = controller.productList
+                            .where((p) => p.showOnHomePage == true)
+                            .toList();
+                        final product = products[index];
+                        return _productCard(product);
+                      },
+                    ),
+            ),
           ],
         ),
       ),
@@ -172,7 +212,7 @@ class HomeMenuScreen extends StatelessWidget {
                   height: 8,
                   decoration: BoxDecoration(
                     color: controller.currentPage.value == index
-                        ? Colors.blue
+                        ? const Color(0xFF0C8AF2)
                         : Colors.grey,
                     borderRadius: BorderRadius.circular(4),
                   ),
@@ -183,175 +223,229 @@ class HomeMenuScreen extends StatelessWidget {
         ));
   }
 
-  /// ✅ **Updated Categories Widget using Real API Data**
+  /// ✅ **Updated Categories Widget with Circular Design**
   Widget categoriesWidgets() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: Get.width * 0.04),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Categories',
-                style: TextStyle(
-                  fontSize: Get.width * 0.06,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: Row(
-                  children: [
-                    Text(
-                      'See All',
-                      style: TextStyle(
-                        fontSize: Get.width * 0.045,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Icon(Icons.arrow_forward, size: Get.width * 0.05),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   children: [
+          //     Text(
+          //       'Categories',
+          //       style: TextStyle(
+          //         fontSize: Get.width * 0.06,
+          //         fontWeight: FontWeight.bold,
+          //       ),
+          //     ),
+          //     TextButton(
+          //       onPressed: () {},
+          //       child: Row(
+          //         children: [
+          //           Text(
+          //             'See All',
+          //             style: TextStyle(
+          //               fontSize: Get.width * 0.045,
+          //               fontWeight: FontWeight.bold,
+          //             ),
+          //           ),
+          //           Icon(Icons.arrow_forward, size: Get.width * 0.05),
+          //         ],
+          //       ),
+          //     ),
+          //   ],
+          // ),
           SizedBox(height: Get.height * 0.02),
-          Obx(() => GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: Get.width * 0.033,
-                  mainAxisSpacing: Get.height * 0.02,
-                  childAspectRatio: 1,
-                ),
-                itemCount: controller.categories.length,
-                itemBuilder: (context, index) {
-                  final category = controller.categories[index];
-                  return Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: Colors.white,
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 5,
-                          spreadRadius: 2,
-                        )
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(4),
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: FadeInImage.assetNetwork(
-                                placeholder:
-                                    'assets/images/loading.gif', // Placeholder while loading
-                                image: category.image.src,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                imageErrorBuilder:
-                                    (context, error, stackTrace) {
-                                  return Image.asset(
-                                    'assets/images/placeholder.jpg',
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                          // Expanded(
-                          //   child: ClipRRect(
-                          //     borderRadius: BorderRadius.circular(10),
-                          //     child: Image.network(
-                          //       category.image.src,
-                          //       fit: BoxFit.cover,
-                          //       width: double.infinity,
-                          //     ),
-                          //   ),
-                          // ),
-                          Padding(
-                            padding: EdgeInsets.all(Get.width * 0.02),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  category.name,
-                                  style: TextStyle(
-                                    fontSize: Get.width * 0.043,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue[100],
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Text(
-                                    "${category.id}", // Dummy count placeholder
-                                    style: TextStyle(
-                                      fontSize: Get.width * 0.04,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+          Obx(
+            () => GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: Get.width * 0.02,
+                mainAxisSpacing: Get.height * 0.02,
+                childAspectRatio: 1,
+              ),
+              itemCount: controller.categories.length,
+              itemBuilder: (context, index) {
+                final category = controller.categories[index];
+                return Column(
+                  children: [
+                    Container(
+                      width: Get.width * 0.17,
+                      height: Get.width * 0.17,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 5,
+                            spreadRadius: 2,
                           ),
                         ],
                       ),
+                      child: ClipOval(
+                        child: FadeInImage.assetNetwork(
+                          placeholder: 'assets/images/loading.gif',
+                          image: category.image.src,
+                          fit: BoxFit.cover,
+                          imageErrorBuilder: (context, error, stackTrace) {
+                            return Image.asset(
+                              'assets/images/placeholder.jpg',
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        ),
+                      ),
                     ),
-                  );
-                },
-              )),
+                    SizedBox(height: Get.height * 0.01),
+                    Text(
+                      category.name,
+                      style: TextStyle(
+                        fontSize: Get.width * 0.033,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // All Items Header
+  Widget _allItemsHeader() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: Get.width * 0.04),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // "All Items" Text
+          Text(
+            "All Items",
+            style: TextStyle(
+              fontSize: Get.width * 0.05,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+
+          // Filter Icon
+          Image.asset('assets/icons/filter_icon.png', width: Get.width * 0.06),
+          // Icon(
+          //   Icons.tune, // This closely matches the filter icon in your image
+          //   size: Get.width * 0.06,
+          //   color: Colors.black,
+          // ),
         ],
       ),
     );
   }
 
   // Top Products Widgets
-  Widget _topProducts() {
+  Widget _productGrid() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: Get.width * 0.04),
+      padding: const EdgeInsets.all(12.0),
+      child: Obx(
+        () => controller.isLoading.value
+            ? const Center(child: CircularProgressIndicator())
+            : GridView.builder(
+                itemCount: controller.productList
+                    .where((p) => p.showOnHomePage == true)
+                    .length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: Get.width > 600 ? 3 : 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.7,
+                ),
+                itemBuilder: (context, index) {
+                  final products = controller.productList
+                      .where((p) => p.showOnHomePage == true)
+                      .toList();
+                  final product = products[index];
+                  return _productCard(product);
+                },
+              ),
+      ),
+    );
+  }
+
+  Widget _productCard(Products product) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16), // Rounded corners
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1), // Light shadow
+            blurRadius: 8,
+            spreadRadius: 2,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Top Products",
-            style: TextStyle(
-              fontSize: Get.width * 0.05,
-              fontWeight: FontWeight.bold,
+          // Product Image
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(16),
+            ),
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+              ),
+              child: Image.network(
+                product.images != null ? product.images!.first.src! : '',
+                height: 150,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
-          SizedBox(height: Get.height * 0.02),
-          Obx(
-            () => SizedBox(
-              height: Get.width * 0.18,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: controller.topProducts.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: Get.width * 0.02),
-                    child: CircleAvatar(
-                      radius: Get.width * 0.09,
-                      backgroundColor: Colors.white,
-                      child: CircleAvatar(
-                        radius: Get.width * 0.085,
-                        backgroundImage:
-                            AssetImage(controller.topProducts[index]),
-                      ),
-                    ),
-                  );
-                },
+
+          const SizedBox(height: 8),
+
+          // Product Title
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              product.name ?? '',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 4),
+
+          // Product Price
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              "\$${product.price?.toStringAsFixed(2)}",
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
             ),
           ),

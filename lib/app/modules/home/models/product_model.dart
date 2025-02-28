@@ -56,7 +56,7 @@ class Products {
   bool? isShipEnabled;
   bool? isFreeShipping;
   bool? shipSeparately;
-  int? additionalShippingCharge;
+  double? additionalShippingCharge = 0;
   bool? isTaxExempt;
   int? taxCategoryId;
   bool?
@@ -80,29 +80,29 @@ class Products {
   String? preOrderAvailabilityStartDateTimeUtc; // Changed from Null to String
   bool? callForPrice;
   double? price;
-  int? oldPrice;
-  int? productCost;
+  double? oldPrice;
+  double? productCost;
   double? specialPrice; // Changed from Null to double
   String? specialPriceStartDateTimeUtc; // Changed from Null to String
   String? specialPriceEndDateTimeUtc; // Changed from Null to String
   bool? customerEntersPrice;
   double? minimumCustomerEnteredPrice;
-  int? maximumCustomerEnteredPrice;
+  double? maximumCustomerEnteredPrice = 0;
   bool? basepriceEnabled;
-  int? basepriceAmount;
-  int? basepriceBaseAmount;
+  double? basepriceAmount = 0;
+  double? basepriceBaseAmount = 0;
   bool? markAsNew;
   String? markAsNewStartDateTimeUtc; // Changed from Null to String
   String? markAsNewEndDateTimeUtc; // Changed from Null to String
   bool? hasTierPrices;
   bool? hasDiscountsApplied;
-  int? weight;
-  int? length;
-  int? width;
-  int? height;
+  double? weight;
+  double? length;
+  double? width;
+  double? height;
   String? availableStartDateTimeUtc; // Changed from Null to String
   String? availableEndDateTimeUtc; // Changed from Null to String
-  int? displayOrder;
+  int? displayOrder = 0;
   bool? published;
   bool? deleted;
   String? createdOnUtc;
@@ -592,9 +592,9 @@ class AttributeValues {
   String? name;
   String? colorSquaresRgb;
   ImageSquaresImage? imageSquaresImage;
-  int? priceAdjustment;
-  int? weightAdjustment;
-  int? cost;
+  double? priceAdjustment = 0;
+  double? weightAdjustment = 0;
+  double? cost = 0;
   int? quantity;
   bool? isPreSelected;
   int? displayOrder;

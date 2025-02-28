@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:nop_commerce/app/modules/home/controllers/auth_controller.dart';
 import 'package:nop_commerce/app/modules/home/models/category_model.dart';
+import 'package:nop_commerce/app/modules/home/models/product_model.dart';
+import 'package:nop_commerce/app/modules/home/services/product_service.dart';
 import 'package:nop_commerce/app/utils/constants.dart';
 
 class HomeController extends GetxController {
@@ -32,6 +34,7 @@ class HomeController extends GetxController {
 
     pageController = PageController(); // Initialize it here
     fetchCategories();
+    fetchProductList();
   }
 
   @override
@@ -118,68 +121,24 @@ class HomeController extends GetxController {
     }
   }
 
-  // final List<Map<String, dynamic>> categories = [
-  //   {
-  //     "title": "Clothing",
-  //     "count": 109,
-  //     "images": [
-  //       "assets/images/category.png",
-  //       "assets/images/category.png",
-  //       "assets/images/category.png",
-  //       "assets/images/category.png"
-  //     ]
-  //   },
-  //   {
-  //     "title": "Shoes",
-  //     "count": 530,
-  //     "images": [
-  //       "assets/images/category.png",
-  //       "assets/images/category.png",
-  //       "assets/images/category.png",
-  //       "assets/images/category.png"
-  //     ]
-  //   },
-  //   {
-  //     "title": "Bags",
-  //     "count": 87,
-  //     "images": [
-  //       "assets/images/category.png",
-  //       "assets/images/category.png",
-  //       "assets/images/category.png",
-  //       "assets/images/category.png"
-  //     ]
-  //   },
-  //   {
-  //     "title": "Lingerie",
-  //     "count": 218,
-  //     "images": [
-  //       "assets/images/category.png",
-  //       "assets/images/category.png",
-  //       "assets/images/category.png",
-  //       "assets/images/category.png"
-  //     ]
-  //   },
-  //   {
-  //     "title": "Watch",
-  //     "count": 218,
-  //     "images": [
-  //       "assets/images/category.png",
-  //       "assets/images/category.png",
-  //       "assets/images/category.png",
-  //       "assets/images/category.png"
-  //     ]
-  //   },
-  //   {
-  //     "title": "Hoodies",
-  //     "count": 218,
-  //     "images": [
-  //       "assets/images/category.png",
-  //       "assets/images/category.png",
-  //       "assets/images/category.png",
-  //       "assets/images/category.png"
-  //     ]
-  //   },
-  // ].obs;
+  // Products ================
+
+  var productList = <Products>[].obs;
+
+  final ProductService _apiService = ProductService();
+
+  void fetchProductList() async {
+    try {
+      isLoading(true);
+      ProductList? products = await _apiService.fetchProducts();
+      if (products != null && products.products != null) {
+        productList.assignAll(products.products!);
+        print('Products fetched: ${productList.length}');
+      }
+    } finally {
+      isLoading(false);
+    }
+  }
 
   // Top Products
   var topProducts = [
