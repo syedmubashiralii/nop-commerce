@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:nop_commerce/app/modules/home/controllers/auth_controller.dart';
+import 'package:nop_commerce/app/modules/home/controllers/authentication_controller.dart';
 import 'package:nop_commerce/app/routes/app_pages.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await GetStorage.init(); // ✅ Initialize GetStorage
-  Get.put(AuthenticationController(),permanent: true);
+  await GetStorage.init();
+  Get.put(AuthenticationController(), permanent: true);
   runApp(const MyApp());
 }
 
@@ -20,11 +20,11 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: "Nop Commerce",
-        initialRoute: AppPages.INITIAL,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
+          fontFamily: 'Raleway',
+          scaffoldBackgroundColor: Colors.white,
         ),
+        initialRoute: AppPages.INITIAL,
         getPages: AppPages.routes);
   }
 }

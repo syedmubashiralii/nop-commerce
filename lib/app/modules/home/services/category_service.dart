@@ -1,39 +1,15 @@
-import 'package:dio/dio.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:nop_commerce/app/utils/constants.dart';
+import 'package:nop_commerce/app/utils/requests.dart';
 import '../models/category_model.dart';
 
 class CategoryService {
-  final Dio _dio = Dio(BaseOptions(
-    baseUrl: baseUrl, // Replace with your API base URL
-    headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-    },
-  ));
-
-  Future<List<Category>> getCategories() async {
+  Future getCategories() async {
     try {
-      final box = GetStorage();
-      String? token =
-          box.read("access_token"); // Retrieve token from local storage
-
-      if (token == null || token.isEmpty) {
-        throw Exception("Authorization token is missing.");
-      }
-
-      Response response = await _dio.get(
-        "/categories",
-        options: Options(
-          headers: {"Authorization": "Bearer $token"},
-        ),
-      );
-
+      var response = await Requests.getDio().get('categories');
       if (response.statusCode == 200) {
-        List data = response.data; // Assuming API returns a list
-        return data.map((json) => Category.fromJson(json)).toList();
+        var data = response.data['categories'];
+        return data;
       } else {
-        throw Exception("Failed to load categories");
+        return null;
       }
     } catch (e) {
       throw Exception("Error: $e");

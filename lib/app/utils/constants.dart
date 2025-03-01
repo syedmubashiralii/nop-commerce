@@ -1,1 +1,1 @@
-String baseUrl = "https://mobiledemo.herohero.store/api";
+String baseUrl = "https://mobiledemo.herohero.store/api/";

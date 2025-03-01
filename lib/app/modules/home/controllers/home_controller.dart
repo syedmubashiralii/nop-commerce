@@ -4,15 +4,18 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:nop_commerce/app/modules/home/controllers/auth_controller.dart';
+import 'package:nop_commerce/app/modules/home/controllers/authentication_controller.dart';
 import 'package:nop_commerce/app/modules/home/models/category_model.dart';
 import 'package:nop_commerce/app/modules/home/models/product_model.dart';
+import 'package:nop_commerce/app/modules/home/models/token_model.dart';
+import 'package:nop_commerce/app/modules/home/services/category_service.dart';
 import 'package:nop_commerce/app/modules/home/services/product_service.dart';
 import 'package:nop_commerce/app/utils/constants.dart';
+import 'package:nop_commerce/app/utils/requests.dart';
 
 class HomeController extends GetxController {
   var currentPage = 0.obs;
-  late PageController pageController; // Declare PageController
+  late PageController pageController;
 
   var authenticationController = Get.find<AuthenticationController>();
 
@@ -32,92 +35,52 @@ class HomeController extends GetxController {
       );
     });
 
-    pageController = PageController(); // Initialize it here
+    pageController = PageController();
     fetchCategories();
     fetchProductList();
   }
 
   @override
   void onClose() {
-    pageController.dispose(); // Dispose of it properly
+    pageController.dispose();
     super.onClose();
   }
 
-// Bottom Navigation
   var selectedIndex = 0.obs;
 
   void changeIndex(int index) {
     selectedIndex.value = index;
   }
 
-  // Catagories===============
+//Categories
 
-  var categories = <Category>[].obs;
-  var isLoading = false.obs;
-  final Dio dio = Dio();
-  final GetStorage storage = GetStorage();
+  var categories = <CategoryModel>[].obs;
+
+  final CategoryService _categoryService = CategoryService();
 
   Future<void> fetchCategories() async {
-    isLoading.value = true;
-
-    // Retrieve token from storage
-    String? token = storage.read('access_token');
-
-    // If token is missing, wait for it to be retrieved
+    String? token = Requests.box.read('access_token');
     if (token == null) {
-      await requestNewToken();
-      token = storage.read('access_token');
-
-      if (token == null) {
-        isLoading.value = false;
-        return;
-      }
+      authenticationController.authModel.value =
+          await Requests.requestNewToken() ?? TokenModel();
+      authenticationController.accessToken.value =
+          authenticationController.authModel.value.accessToken ?? "";
+      authenticationController.customerGuid.value =
+          authenticationController.authModel.value.customerGuid ?? "";
     }
-
     try {
-      final response = await dio.get(
-        '$baseUrl/categories',
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        ),
-      );
-
-      if (response.statusCode == 200) {
-        var jsonData = response.data; // Ensure jsonData is a Map
-        if (jsonData is Map && jsonData.containsKey('categories')) {
-          List<dynamic> categoryList = jsonData['categories']; // Extract list
-          List<Category> loadedCategories =
-              categoryList.map((json) => Category.fromJson(json)).toList();
-          categories.assignAll(loadedCategories);
-        }
+      var categoriesData = await _categoryService.getCategories();
+      if (categoriesData is List) {
+        List<CategoryModel> loadedCategories = categoriesData
+            .map((json) => CategoryModel.fromJson(json as Map<String, dynamic>))
+            .toList();
+        categories.assignAll(loadedCategories);
+        categories.refresh();
+      } else {
+        print("Invalid categories data format");
       }
     } catch (e) {
       print('Error fetching categories: $e');
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  Future<void> requestNewToken() async {
-    try {
-      final response = await dio.post(
-        'https://mobiledemo.herohero.store/token',
-        data: {
-          "guest": "true",
-          "username": "",
-          "password": "",
-          "remember_me": "true",
-        },
-      );
-
-      if (response.statusCode == 200) {
-        String accessToken = response.data['access_token'];
-        storage.write('access_token', accessToken);
-      }
-    } catch (e) {
-      print('Error fetching new token: $e');
     }
   }
 
@@ -125,27 +88,18 @@ class HomeController extends GetxController {
 
   var productList = <Products>[].obs;
 
-  final ProductService _apiService = ProductService();
+  final ProductService _productsService = ProductService();
 
   void fetchProductList() async {
     try {
-      isLoading(true);
-      ProductList? products = await _apiService.fetchProducts();
+      ProductList? products = await _productsService.fetchProducts();
       if (products != null && products.products != null) {
         productList.assignAll(products.products!);
+        productList.refresh();
         print('Products fetched: ${productList.length}');
       }
-    } finally {
-      isLoading(false);
-    }
+    } catch (e) {
+      print(e.toString());
+    } finally {}
   }
-
-  // Top Products
-  var topProducts = [
-    'assets/images/bag.png',
-    'assets/images/bag.png',
-    'assets/images/bag.png',
-    'assets/images/bag.png',
-    'assets/images/bag.png',
-  ].obs;
 }

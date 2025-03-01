@@ -1,4 +1,4 @@
-class Category {
+class CategoryModel {
   String name;
   String? description;
   int categoryTemplateId;
@@ -15,7 +15,7 @@ class Category {
   String seName;
   int id;
 
-  Category({
+  CategoryModel({
     required this.name,
     this.description,
     required this.categoryTemplateId,
@@ -33,8 +33,8 @@ class Category {
     required this.id,
   });
 
-  factory Category.fromJson(Map<String, dynamic> json) {
-    return Category(
+  factory CategoryModel.fromJson(Map<String, dynamic> json) {
+    return CategoryModel(
       name: json['name'],
       description: json['description'],
       categoryTemplateId: json['category_template_id'],
