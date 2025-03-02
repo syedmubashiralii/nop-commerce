@@ -5,6 +5,7 @@ import 'package:nop_commerce/app/models/category_model.dart';
 import 'package:nop_commerce/app/utils/color_helper.dart';
 import 'package:nop_commerce/app/utils/custom_flash_widget.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
+import 'package:nop_commerce/app/views/shop/category_products_view.dart';
 
 class AllCategoriesView extends StatelessWidget {
   AllCategoriesView({super.key});
@@ -32,7 +33,7 @@ class AllCategoriesView extends StatelessWidget {
 
   Widget _fab() {
     return InkWell(
-      onTap: () {
+      onTap: () async {
         var selectedCategory = homeController.selectedCategory.value;
         var selectedSubcategory = homeController.selectedSubCategory.value;
         var hasSubcategories = homeController.relatedSubcategories.isNotEmpty;
@@ -48,6 +49,14 @@ class AllCategoriesView extends StatelessWidget {
               message: "Please select a subcategory.");
           return;
         }
+
+        int id = (hasSubcategories && selectedSubcategory.id != null)
+            ? selectedSubcategory.id!
+            : selectedCategory.id!;
+
+        await homeController.fetchCategoryProductList(id);
+        Get.to(()=>CategoryProductsView());
+
       },
       child: const CircleAvatar(
         backgroundColor: ColorHelper.blueColor,
@@ -189,6 +198,11 @@ class AllCategoriesView extends StatelessWidget {
                   homeController.selectedSubCategory.value.id == subcategory.id;
               return InkWell(
                 onTap: () {
+                  if(isSelected)
+                  {
+                    homeController.selectedSubCategory.value=CategoryModel();
+                    return;
+                  }
                   homeController.selectedSubCategory.value = subcategory;
                 },
                 child: Container(

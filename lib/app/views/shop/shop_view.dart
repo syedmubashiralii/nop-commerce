@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nop_commerce/app/controllers/home_controller.dart';
@@ -271,7 +272,7 @@ class ShopView extends StatelessWidget {
                 color: Colors.black,
                 borderRadius: BorderRadius.circular(6),
                 image: DecorationImage(
-                  image: NetworkImage(
+                  image: CachedNetworkImageProvider(
                     product.images != null ? product.images!.first.src! : '',
                   ),
                   fit: BoxFit.cover,

@@ -11,13 +11,15 @@ import 'package:nop_commerce/app/services/category_service.dart';
 import 'package:nop_commerce/app/services/product_service.dart';
 import 'package:nop_commerce/app/utils/requests.dart';
 import 'package:nop_commerce/app/views/shop/all_categories_view.dart';
+import 'package:nop_commerce/app/views/shop/category_products_view.dart';
 
 class HomeController extends GetxController {
   var currentPage = 0.obs;
   late PageController pageController;
 
   var authenticationController = Get.find<AuthenticationController>();
-  String get selectedCurrency => authenticationController.stores[0].currencies[0].currencyCode;
+  String get selectedCurrency =>
+      authenticationController.stores[0].currencies[0].currencyCode;
 
   @override
   void onInit() {
@@ -62,15 +64,19 @@ class HomeController extends GetxController {
 
   final CategoryService _categoryService = CategoryService();
 
-  void onSelectCategory(CategoryModel category,bool navigate) {
+  Future<void> onSelectCategory(CategoryModel category, bool navigate) async {
     relatedSubcategories = subcategories
         .where((sub) => sub.parentCategoryId == category.id)
         .toList()
         .obs;
     log("${category.name}${relatedSubcategories.toString()}");
     selectedCategory.value = category;
-    if (relatedSubcategories.isNotEmpty&&navigate==true) {
+    if (relatedSubcategories.isNotEmpty && navigate == true) {
       Get.to(AllCategoriesView());
+    } else if (relatedSubcategories.isEmpty && navigate == true) {
+      selectedSubCategory.value=CategoryModel();
+      await fetchCategoryProductList(category.id ?? 0);
+      Get.to(()=>CategoryProductsView());
     }
   }
 
@@ -107,6 +113,7 @@ class HomeController extends GetxController {
   // Products ================
 
   var productList = <Products>[].obs;
+  var categoryProductList = <Products>[].obs;
 
   final ProductService _productsService = ProductService();
 
@@ -117,6 +124,20 @@ class HomeController extends GetxController {
         productList.assignAll(products.products!);
         productList.refresh();
         print('Products fetched: ${productList.length}');
+      }
+    } catch (e) {
+      print(e.toString());
+    } finally {}
+  }
+
+  Future fetchCategoryProductList(int id) async {
+    try {
+      ProductList? products =
+          await _productsService.fetchProductsByCategory(id);
+      if (products != null && products.products != null) {
+        categoryProductList.assignAll(products.products!);
+        categoryProductList.refresh();
+        print('Category Products fetched: ${categoryProductList.length}');
       }
     } catch (e) {
       print(e.toString());
