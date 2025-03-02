@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nop_commerce/app/controllers/authentication_controller.dart';
@@ -16,7 +17,7 @@ import 'package:nop_commerce/app/views/shop/category_products_view.dart';
 class HomeController extends GetxController {
   var currentPage = 0.obs;
   late PageController pageController;
-
+  CarouselSliderController productImageController = CarouselSliderController();
   var authenticationController = Get.find<AuthenticationController>();
   String get selectedCurrency =>
       authenticationController.stores[0].currencies[0].currencyCode;
@@ -114,6 +115,7 @@ class HomeController extends GetxController {
 
   var productList = <Products>[].obs;
   var categoryProductList = <Products>[].obs;
+  var selectedProduct= Products().obs;
 
   final ProductService _productsService = ProductService();
 

@@ -43,6 +43,8 @@ dependencies:
       url: https://github.com/syedmubashiralii/flash.git
       ref: master
   cached_network_image: ^3.4.1  
+  carousel_slider: ^5.0.0
+  animate_do: ^3.3.4
 
 dev_dependencies:
   flutter_test:
