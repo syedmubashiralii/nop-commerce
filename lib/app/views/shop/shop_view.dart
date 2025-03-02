@@ -6,6 +6,7 @@ import 'package:nop_commerce/app/controllers/home_controller.dart';
 import 'package:nop_commerce/app/models/product_model.dart';
 import 'package:nop_commerce/app/utils/color_helper.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
+import 'package:nop_commerce/app/views/shop/all_categories_view.dart';
 
 class ShopView extends StatelessWidget {
   final HomeController controller = Get.find<HomeController>();
@@ -25,11 +26,11 @@ class ShopView extends StatelessWidget {
                 19.SpaceX,
                 _buildSlider(),
                 20.SpaceX,
-                _header('Categories'),
+                _header('Categories', () => Get.to(AllCategoriesView())),
                 10.SpaceX,
                 _allCategories(),
                 10.SpaceX,
-                _header('All Items'),
+                _header('All Items', () {}),
                 10.SpaceX,
                 _allItemsGrid()
               ],
@@ -41,7 +42,7 @@ class ShopView extends StatelessWidget {
   }
 
   Widget _appBar() {
-    return const Column(
+    return const Row(
       children: [
         Text(
           'Shop',
@@ -146,12 +147,7 @@ class ShopView extends StatelessWidget {
         itemBuilder: (context, index) {
           final category = controller.categories[index];
           return InkWell(
-            onTap: (){
-              var relatedSubcategories = controller.subcategories
-                .where((sub) => sub.parentCategoryId == category.id)
-                .toList();
-              log("${category.name}${relatedSubcategories.toString()}");  
-            },
+            onTap: () => controller.onSelectCategory(category, true),
             child: Column(
               children: [
                 Container(
@@ -171,7 +167,7 @@ class ShopView extends StatelessWidget {
                   child: ClipOval(
                     child: FadeInImage.assetNetwork(
                       placeholder: 'assets/images/loading.gif',
-                      image: category.image.src,
+                      image: category.image?.src ?? "",
                       fit: BoxFit.cover,
                       imageErrorBuilder: (context, error, stackTrace) {
                         return Image.asset(
@@ -184,7 +180,7 @@ class ShopView extends StatelessWidget {
                 ),
                 9.SpaceX,
                 Text(
-                  category.name,
+                  category.name ?? "",
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
@@ -199,21 +195,21 @@ class ShopView extends StatelessWidget {
     );
   }
 
-  Widget _header(String title,) {
+  Widget _header(String title, VoidCallback onTap) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 21,
             fontWeight: FontWeight.w700,
             color: Colors.black,
           ),
         ),
         TextButton(
-          onPressed: () {},
-          child: Text(
+          onPressed: onTap,
+          child: const Text(
             "See All",
             style: TextStyle(
               fontSize: 14,
@@ -269,7 +265,7 @@ class ShopView extends StatelessWidget {
               ),
             ],
           ),
-          padding: EdgeInsets.all(5),
+          padding: const EdgeInsets.all(5),
           child: Container(
             decoration: BoxDecoration(
                 color: Colors.black,
@@ -294,14 +290,24 @@ class ShopView extends StatelessWidget {
           ),
         ),
         1.SpaceX,
-        Text(
-          "\$${product.price?.toStringAsFixed(2)}",
-          style: const TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
-          ),
-        ),
+        RichText(
+            text: TextSpan(
+                text: "${controller.selectedCurrency}",
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+                children: [
+              TextSpan(
+                text: "${product.price?.toStringAsFixed(2)}",
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
+              )
+            ]))
       ],
     );
   }

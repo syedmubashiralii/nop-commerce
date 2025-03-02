@@ -1,23 +1,23 @@
 import 'dart:async';
+import 'dart:developer';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:nop_commerce/app/controllers/authentication_controller.dart';
 import 'package:nop_commerce/app/models/category_model.dart';
 import 'package:nop_commerce/app/models/product_model.dart';
 import 'package:nop_commerce/app/models/token_model.dart';
 import 'package:nop_commerce/app/services/category_service.dart';
 import 'package:nop_commerce/app/services/product_service.dart';
-import 'package:nop_commerce/app/utils/constants.dart';
 import 'package:nop_commerce/app/utils/requests.dart';
+import 'package:nop_commerce/app/views/shop/all_categories_view.dart';
 
 class HomeController extends GetxController {
   var currentPage = 0.obs;
   late PageController pageController;
 
   var authenticationController = Get.find<AuthenticationController>();
+  String get selectedCurrency => authenticationController.stores[0].currencies[0].currencyCode;
 
   @override
   void onInit() {
@@ -56,8 +56,23 @@ class HomeController extends GetxController {
 
   var categories = <CategoryModel>[].obs;
   var subcategories = <CategoryModel>[].obs;
+  Rx<CategoryModel> selectedCategory = CategoryModel().obs;
+  Rx<CategoryModel> selectedSubCategory = CategoryModel().obs;
+  var relatedSubcategories = <CategoryModel>[].obs;
 
   final CategoryService _categoryService = CategoryService();
+
+  void onSelectCategory(CategoryModel category,bool navigate) {
+    relatedSubcategories = subcategories
+        .where((sub) => sub.parentCategoryId == category.id)
+        .toList()
+        .obs;
+    log("${category.name}${relatedSubcategories.toString()}");
+    selectedCategory.value = category;
+    if (relatedSubcategories.isNotEmpty&&navigate==true) {
+      Get.to(AllCategoriesView());
+    }
+  }
 
   Future<void> fetchCategories() async {
     String? token = Requests.box.read('access_token');

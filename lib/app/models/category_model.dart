@@ -1,36 +1,36 @@
 class CategoryModel {
-  String name;
+  String? name;
   String? description;
-  int categoryTemplateId;
-  int parentCategoryId;
-  int pageSize;
-  List<int> pageSizeOptions;
-  bool includeInTopMenu;
-  bool published;
-  bool deleted;
-  int displayOrder;
-  String createdOnUtc;
-  String updatedOnUtc;
-  ImageData image;
-  String seName;
-  int id;
+  int? categoryTemplateId;
+  int? parentCategoryId;
+  int? pageSize;
+  List<int>? pageSizeOptions;
+  bool? includeInTopMenu;
+  bool? published;
+  bool? deleted;
+  int? displayOrder;
+  String? createdOnUtc;
+  String? updatedOnUtc;
+  ImageData? image;
+  String? seName;
+  int? id;
 
   CategoryModel({
-    required this.name,
+    this.name,
     this.description,
-    required this.categoryTemplateId,
-    required this.parentCategoryId,
-    required this.pageSize,
-    required this.pageSizeOptions,
-    required this.includeInTopMenu,
-    required this.published,
-    required this.deleted,
-    required this.displayOrder,
-    required this.createdOnUtc,
-    required this.updatedOnUtc,
-    required this.image,
-    required this.seName,
-    required this.id,
+    this.categoryTemplateId,
+    this.parentCategoryId,
+    this.pageSize,
+    this.pageSizeOptions,
+    this.includeInTopMenu,
+    this.published,
+    this.deleted,
+    this.displayOrder,
+    this.createdOnUtc,
+    this.updatedOnUtc,
+    this.image,
+    this.seName,
+    this.id,
   });
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
