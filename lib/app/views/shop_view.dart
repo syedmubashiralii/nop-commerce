@@ -1,7 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nop_commerce/app/modules/home/controllers/home_controller.dart';
-import 'package:nop_commerce/app/modules/home/models/product_model.dart';
+import 'package:nop_commerce/app/controllers/home_controller.dart';
+import 'package:nop_commerce/app/models/product_model.dart';
 import 'package:nop_commerce/app/utils/color_helper.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
 
@@ -23,10 +25,12 @@ class ShopView extends StatelessWidget {
                 19.SpaceX,
                 _buildSlider(),
                 20.SpaceX,
-                categoriesWidgets(),
+                _header('Categories'),
                 10.SpaceX,
-                _allItemsHeader(),
-                15.SpaceX,
+                _allCategories(),
+                10.SpaceX,
+                _header('All Items'),
+                10.SpaceX,
                 _allItemsGrid()
               ],
             ),
@@ -125,83 +129,99 @@ class ShopView extends StatelessWidget {
         ));
   }
 
-  Widget categoriesWidgets() {
+  Widget _allCategories() {
     return Obx(
       () => GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 5, // Change to 5 items per row
+          crossAxisCount: 5,
           crossAxisSpacing: Get.width * 0.02,
           mainAxisSpacing: Get.height * 0.02,
-          childAspectRatio: 0.8, // Adjust ratio for better spacing
+          childAspectRatio: 0.8,
         ),
-        itemCount: controller.categories.length,
+        itemCount: controller.categories.length > 10
+            ? 10
+            : controller.categories.length,
         itemBuilder: (context, index) {
           final category = controller.categories[index];
-          return Column(
-            children: [
-              Container(
-                width: 60, // Adjust width for smaller circles
-                height: 60,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 5),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black.withOpacity(.2),
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                        offset: const Offset(0, 5)),
-                  ],
-                ),
-                child: ClipOval(
-                  child: FadeInImage.assetNetwork(
-                    placeholder: 'assets/images/loading.gif',
-                    image: category.image.src,
-                    fit: BoxFit.cover,
-                    imageErrorBuilder: (context, error, stackTrace) {
-                      return Image.asset(
-                        'assets/images/placeholder.jpg',
-                        fit: BoxFit.cover,
-                      );
-                    },
+          return InkWell(
+            onTap: (){
+              var relatedSubcategories = controller.subcategories
+                .where((sub) => sub.parentCategoryId == category.id)
+                .toList();
+              log("${category.name}${relatedSubcategories.toString()}");  
+            },
+            child: Column(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 5),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withOpacity(.2),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                          offset: const Offset(0, 5)),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: FadeInImage.assetNetwork(
+                      placeholder: 'assets/images/loading.gif',
+                      image: category.image.src,
+                      fit: BoxFit.cover,
+                      imageErrorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          'assets/images/placeholder.jpg',
+                          fit: BoxFit.cover,
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ),
-              9.SpaceX,
-              Text(
-                category.name,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
+                9.SpaceX,
+                Text(
+                  category.name,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),
     );
   }
 
-  Widget _allItemsHeader() {
+  Widget _header(String title,) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          "All Items",
+        Text(
+          title,
           style: TextStyle(
             fontSize: 21,
             fontWeight: FontWeight.w700,
             color: Colors.black,
           ),
         ),
-        Image.asset(
-          'assets/icons/filter_icon.png',
-          width: 25,
-          height: 25,
-        ),
+        TextButton(
+          onPressed: () {},
+          child: Text(
+            "See All",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: ColorHelper.blueColor,
+            ),
+          ),
+        )
       ],
     );
   }
@@ -209,25 +229,25 @@ class ShopView extends StatelessWidget {
   Widget _allItemsGrid() {
     return Obx(
       () => GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: controller.productList
-                  .where((p) => p.showOnHomePage == true)
-                  .length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: Get.width > 600 ? 3 : 2,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 4,
-                childAspectRatio: 0.8,
-              ),
-              itemBuilder: (context, index) {
-                final products = controller.productList
-                    .where((p) => p.showOnHomePage == true)
-                    .toList();
-                final product = products[index];
-                return _productCard(product);
-              },
-            ),
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: controller.productList
+            .where((p) => p.showOnHomePage == true)
+            .length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: Get.width > 600 ? 3 : 2,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 4,
+          childAspectRatio: 0.8,
+        ),
+        itemBuilder: (context, index) {
+          final products = controller.productList
+              .where((p) => p.showOnHomePage == true)
+              .toList();
+          final product = products[index];
+          return _productCard(product);
+        },
+      ),
     );
   }
 
@@ -239,10 +259,10 @@ class ShopView extends StatelessWidget {
           height: 181,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(9), 
+            borderRadius: BorderRadius.circular(9),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1), 
+                color: Colors.black.withOpacity(0.1),
                 blurRadius: 10,
                 spreadRadius: 0,
                 offset: const Offset(0, 5),

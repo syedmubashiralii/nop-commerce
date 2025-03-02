@@ -4,7 +4,7 @@ import 'package:dio/src/response.dart' as DioResponse;
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:nop_commerce/app/modules/home/models/token_model.dart';
+import 'package:nop_commerce/app/models/token_model.dart';
 import 'package:nop_commerce/app/utils/constants.dart';
 import 'package:nop_commerce/app/utils/dialogs/loading_dialog.dart';
 

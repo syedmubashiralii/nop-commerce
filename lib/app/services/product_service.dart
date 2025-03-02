@@ -1,4 +1,4 @@
-import 'package:nop_commerce/app/modules/home/models/product_model.dart';
+import 'package:nop_commerce/app/models/product_model.dart';
 import 'package:nop_commerce/app/utils/requests.dart';
 
 class ProductService {

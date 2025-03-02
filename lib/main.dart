@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:nop_commerce/app/modules/home/controllers/authentication_controller.dart';
+import 'package:nop_commerce/app/controllers/authentication_controller.dart';
 import 'package:nop_commerce/app/routes/app_pages.dart';
 
 void main() async {

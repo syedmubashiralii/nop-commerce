@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:get/get.dart';
-import 'package:nop_commerce/app/modules/home/models/store_model.dart';
-import 'package:nop_commerce/app/modules/home/models/token_model.dart';
+import 'package:nop_commerce/app/models/store_model.dart';
+import 'package:nop_commerce/app/models/token_model.dart';
 import 'package:nop_commerce/app/utils/requests.dart';
 
 class AuthenticationController extends GetxController {

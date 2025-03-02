@@ -4,12 +4,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:nop_commerce/app/modules/home/controllers/authentication_controller.dart';
-import 'package:nop_commerce/app/modules/home/models/category_model.dart';
-import 'package:nop_commerce/app/modules/home/models/product_model.dart';
-import 'package:nop_commerce/app/modules/home/models/token_model.dart';
-import 'package:nop_commerce/app/modules/home/services/category_service.dart';
-import 'package:nop_commerce/app/modules/home/services/product_service.dart';
+import 'package:nop_commerce/app/controllers/authentication_controller.dart';
+import 'package:nop_commerce/app/models/category_model.dart';
+import 'package:nop_commerce/app/models/product_model.dart';
+import 'package:nop_commerce/app/models/token_model.dart';
+import 'package:nop_commerce/app/services/category_service.dart';
+import 'package:nop_commerce/app/services/product_service.dart';
 import 'package:nop_commerce/app/utils/constants.dart';
 import 'package:nop_commerce/app/utils/requests.dart';
 
@@ -55,6 +55,7 @@ class HomeController extends GetxController {
 //Categories
 
   var categories = <CategoryModel>[].obs;
+  var subcategories = <CategoryModel>[].obs;
 
   final CategoryService _categoryService = CategoryService();
 
@@ -74,7 +75,11 @@ class HomeController extends GetxController {
         List<CategoryModel> loadedCategories = categoriesData
             .map((json) => CategoryModel.fromJson(json as Map<String, dynamic>))
             .toList();
-        categories.assignAll(loadedCategories);
+        categories.assignAll(
+            loadedCategories.where((p) => p.parentCategoryId == 0).toList());
+        subcategories.assignAll(
+            loadedCategories.where((p) => p.parentCategoryId != 0).toList());
+
         categories.refresh();
       } else {
         print("Invalid categories data format");

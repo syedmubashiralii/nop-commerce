@@ -2,10 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nop_commerce/app/modules/home/controllers/home_controller.dart';
-import 'package:nop_commerce/app/modules/home/models/product_model.dart';
-import 'package:nop_commerce/app/modules/home/views/shop_view.dart';
+import 'package:nop_commerce/app/controllers/home_controller.dart';
 import 'package:nop_commerce/app/utils/color_helper.dart';
+import 'package:nop_commerce/app/views/shop_view.dart';
 
 class HomeView extends GetView<HomeController> {
   HomeView({super.key});
