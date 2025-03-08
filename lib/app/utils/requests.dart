@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:nop_commerce/app/models/token_model.dart';
 import 'package:nop_commerce/app/utils/constants.dart';
+import 'package:nop_commerce/app/utils/custom_flash_widget.dart';
 import 'package:nop_commerce/app/utils/dialogs/loading_dialog.dart';
 
 class Requests {
@@ -28,12 +29,15 @@ class Requests {
       validateStatus: (status) {
         if (status! == 401 || status == 403) {
           requestNewToken();
-          Get.snackbar("Session Expired".tr,
+          CustomFlashWidget.showFlashMessage(message: 
               "Your app session has been expired. Please log in again!".tr);
         }
         if (status == 502) {
-          Get.snackbar(
-              "Internal Server Error".tr, "Please try again later!".tr);
+          CustomFlashWidget.showFlashMessage(
+              message:  "Please try again later!".tr);
+        }
+         if (!(Get.isDialogOpen ?? false) && showLoadingDialog) {
+          Get.dialog(const LoadingDialog());
         }
         return status <= 500;
       },

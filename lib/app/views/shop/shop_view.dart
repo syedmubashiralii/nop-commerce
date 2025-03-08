@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nop_commerce/app/controllers/home_controller.dart';
@@ -55,82 +56,81 @@ class ShopView extends StatelessWidget {
     );
   }
 
-  Widget _buildSlider() {
-    return Obx(() => Column(
-          children: [
-            Container(
-              width: Get.width,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: Colors.amber,
-              ),
-              height: 130,
-              child: PageView.builder(
-                controller: controller.pageController,
-                itemCount: 4,
-                onPageChanged: (index) {
+
+Widget _buildSlider() {
+  return Column(
+        children: [
+            CarouselSlider(
+              options: CarouselOptions(
+                height: 130,
+                autoPlay: true,
+                enlargeCenterPage: true,
+                viewportFraction: 1,
+                onPageChanged: (index, reason) {
                   controller.currentPage.value = index;
                 },
-                itemBuilder: (context, index) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      image: const DecorationImage(
-                        image: AssetImage('assets/images/big_sale.png'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12, horizontal: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text('Big Sale',
-                              style: TextStyle(
-                                  fontSize: 29,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white)),
-                          1.SpaceX,
-                          const Text('Up to 50%',
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white)),
-                          29.SpaceX,
-                          const Text('Happening Now',
-                              style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white)),
-                        ],
-                      ),
-                    ),
-                  );
-                },
               ),
-            ),
-            10.SpaceX,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(4, (index) {
+              items: List.generate(4, (index) {
                 return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: controller.currentPage.value == index ? 40 : 10,
-                  height: 10,
                   decoration: BoxDecoration(
-                    color: controller.currentPage.value == index
-                        ? ColorHelper.blueColor
-                        : ColorHelper.blueColor.withOpacity(.2),
-                    borderRadius: BorderRadius.circular(5),
+                     borderRadius: BorderRadius.circular(15),
+                color: Colors.amber,
+                    image: const DecorationImage(
+                      image: AssetImage('assets/images/big_sale.png'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  width: Get.width,
+                  child: const Padding(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 12,horizontal: 16 ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Big Sale',
+                            style: TextStyle(
+                                fontSize: 29,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white)),
+                        SizedBox(height: 4),
+                        Text('Up to 50%',
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white)),
+                        SizedBox(height: 4),
+                        Text('Happening Now',
+                            style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white)),
+                      ],
+                    ),
                   ),
                 );
               }),
             ),
-          ],
-        ));
-  }
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(4, (index) {
+              return Obx(() => Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: controller.currentPage.value == index ? 40 : 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: controller.currentPage.value == index
+                          ? ColorHelper.blueColor
+                          : ColorHelper.blueColor.withOpacity(.2),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ));
+            }),
+          ),
+        ],
+  );
+}
 
   Widget _allCategories() {
     return Obx(

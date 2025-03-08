@@ -16,36 +16,20 @@ import 'package:nop_commerce/app/views/shop/category_products_view.dart';
 
 class HomeController extends GetxController {
   var currentPage = 0.obs;
-  late PageController pageController;
   CarouselSliderController productImageController = CarouselSliderController();
   var authenticationController = Get.find<AuthenticationController>();
   String get selectedCurrency =>
       authenticationController.stores[0].currencies[0].currencyCode;
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
-    Timer.periodic(const Duration(seconds: 3), (Timer timer) {
-      if (currentPage.value < 3) {
-        currentPage.value++;
-      } else {
-        currentPage.value = 0;
-      }
-      pageController.animateToPage(
-        currentPage.value,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
-    });
-
-    pageController = PageController();
-    fetchCategories();
-    fetchProductList();
+    await fetchCategories();
+    await fetchProductList();
   }
 
   @override
   void onClose() {
-    pageController.dispose();
     super.onClose();
   }
 
@@ -75,9 +59,9 @@ class HomeController extends GetxController {
     if (relatedSubcategories.isNotEmpty && navigate == true) {
       Get.to(AllCategoriesView());
     } else if (relatedSubcategories.isEmpty && navigate == true) {
-      selectedSubCategory.value=CategoryModel();
+      selectedSubCategory.value = CategoryModel();
       await fetchCategoryProductList(category.id ?? 0);
-      Get.to(()=>CategoryProductsView());
+      Get.to(() => CategoryProductsView());
     }
   }
 
@@ -115,11 +99,11 @@ class HomeController extends GetxController {
 
   var productList = <Products>[].obs;
   var categoryProductList = <Products>[].obs;
-  var selectedProduct= Products().obs;
+  var selectedProduct = Products().obs;
 
   final ProductService _productsService = ProductService();
 
-  void fetchProductList() async {
+  Future fetchProductList() async {
     try {
       ProductList? products = await _productsService.fetchProducts();
       if (products != null && products.products != null) {

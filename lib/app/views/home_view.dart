@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nop_commerce/app/controllers/home_controller.dart';
 import 'package:nop_commerce/app/utils/color_helper.dart';
+import 'package:nop_commerce/app/views/settings/settings_view.dart';
 import 'package:nop_commerce/app/views/shop/shop_view.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -17,7 +18,7 @@ class HomeView extends GetView<HomeController> {
     const Center(child: Text("Favorites")),
     const Center(child: Text("Orders")),
     const Center(child: Text("Cart")),
-    const Center(child: Text("Profile")),
+    SettingsView(),
   ];
 
   // Icons
