@@ -6,6 +6,7 @@ import 'package:nop_commerce/app/controllers/home_controller.dart';
 import 'package:nop_commerce/app/utils/color_helper.dart';
 import 'package:nop_commerce/app/views/settings/settings_view.dart';
 import 'package:nop_commerce/app/views/shop/shop_view.dart';
+import 'package:nop_commerce/app/views/wishlist/wishlist_view.dart';
 
 class HomeView extends GetView<HomeController> {
   HomeView({super.key});
@@ -15,7 +16,7 @@ class HomeView extends GetView<HomeController> {
 // Screens
   final List<Widget> screens = [
     ShopView(),
-    const Center(child: Text("Favorites")),
+    WishlistView(),
     const Center(child: Text("Orders")),
     const Center(child: Text("Cart")),
     SettingsView(),

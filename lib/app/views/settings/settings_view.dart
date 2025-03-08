@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nop_commerce/app/controllers/settings_controller.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
+import 'package:nop_commerce/app/views/settings/country_list_view.dart';
+import 'package:nop_commerce/app/views/settings/currency_view.dart';
+import 'package:nop_commerce/app/views/settings/language_view.dart';
 import 'package:nop_commerce/app/views/settings/profile_view.dart';
+import 'package:nop_commerce/app/views/settings/shipping_address.dart';
+import 'package:nop_commerce/app/views/settings/sizes_view.dart';
 import 'package:nop_commerce/app/views/settings/widgets/common_widgets.dart';
 
 class SettingsView extends StatelessWidget {
@@ -20,37 +25,64 @@ class SettingsView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-             AppBarWidget(text: 'Settings',),
+              AppBarWidget(
+                text: 'Settings',
+              ),
               27.SpaceX,
               _subTitle('Personal'),
               33.SpaceX,
-              _item('Profile',onTap: (){
-                Get.to(ProfileView());
+              _item('Profile', onTap: () {
+                Get.to(() => ProfileView());
               }),
               25.SpaceX,
-              _item('Shipping Address'),
-              25.SpaceX,
-              _item('Payment methods'),
+              _item('Shipping Address', onTap: () {
+                Get.to(() => ShippingAddressView());
+              }),
+              // 25.SpaceX,
+              // _item('Payment methods'),
               31.SpaceX,
               _subTitle('Shop'),
               33.SpaceX,
-              _item('Country', subValue: 'Vietnam'),
+              Obx(
+                 () {
+                  return _item('Country', subValue: controller.selectedCountry.value, onTap: () {
+                    Get.to(() => CountryListView());
+                  });
+                }
+              ),
               22.SpaceX,
-              _item('Country', subValue: '\$ USD'),
+              Obx(() {
+                return _item('Currency',
+                    subValue: '${controller.selectedCurrency.value}',
+                    onTap: () {
+                  Get.to(CurrencyView());
+                });
+              }),
               22.SpaceX,
-              _item('Sizes', subValue: 'UK'),
+              Obx(() {
+                return _item('Sizes', subValue: controller.selectedSize.value,
+                    onTap: () {
+                  Get.to(() => SizesView());
+                });
+              }),
               22.SpaceX,
-              _item('Terms and Conditions', subValue: 'UK'),
+              _item('Terms and Conditions'),
               31.SpaceX,
               _subTitle('Account'),
               33.SpaceX,
-              _item('Language', subValue: 'English'),
+              Obx(() {
+                return _item('Language',
+                    subValue: controller.selectedLanguage.value, onTap: () {
+                  Get.to(() => LanguageView());
+                });
+              }),
               22.SpaceX,
-              _item('About Slada'),
+              _item(
+                  'About ${controller.authenticationController.stores[0].name}'),
               45.SpaceX,
               _deleteMyAccount(),
               31.SpaceX,
-              _subTitle('Slada'),
+              _subTitle(controller.authenticationController.stores[0].name),
               2.SpaceX,
               _version(),
               35.SpaceX,
@@ -61,8 +93,6 @@ class SettingsView extends StatelessWidget {
     );
   }
 
-  
-
   Widget _subTitle(String text) {
     return Text(
       text,
@@ -72,10 +102,10 @@ class SettingsView extends StatelessWidget {
     );
   }
 
-  Widget _item(String text, {String? subValue,VoidCallback? onTap}) {
+  Widget _item(String text, {String? subValue, VoidCallback? onTap}) {
     return Column(
       children: [
-        InkWell(
+        GestureDetector(
           onTap: onTap,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -123,16 +153,15 @@ class SettingsView extends StatelessWidget {
   }
 
   Widget _version() {
-  return Obx(() {
-    if (controller.packageInfo.value == null) {
-      return const CircularProgressIndicator(); 
-    }
-    return Text(
-      'Version ${controller.packageInfo.value!.version} ${controller.formattedDate.value}',
-      style: const TextStyle(
-          fontSize: 12, fontWeight: FontWeight.w400, color: Colors.black),
-    );
-  });
-}
-
+    return Obx(() {
+      if (controller.packageInfo.value == null) {
+        return const CircularProgressIndicator();
+      }
+      return Text(
+        'Version ${controller.packageInfo.value!.version} ${controller.formattedDate.value}',
+        style: const TextStyle(
+            fontSize: 12, fontWeight: FontWeight.w400, color: Colors.black),
+      );
+    });
+  }
 }
