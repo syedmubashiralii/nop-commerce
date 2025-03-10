@@ -6,7 +6,9 @@ class CustomButton extends StatelessWidget {
   String buttonText;
   Color? buttonColor;
   VoidCallback? onTap;
-  CustomButton({super.key, required this.buttonText,this.buttonColor,this.onTap});
+  TextStyle? textStyle;
+  EdgeInsetsGeometry? padding;
+  CustomButton({super.key, required this.buttonText,this.buttonColor,this.onTap,this.textStyle,this.padding});
 
   @override
   Widget build(BuildContext context) {
@@ -14,14 +16,14 @@ class CustomButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: Get.width,
-        padding: const EdgeInsets.symmetric(vertical: 9),
+        padding:padding?? const EdgeInsets.symmetric(vertical: 9),
         decoration: BoxDecoration(
           color:buttonColor?? ColorHelper.blueColor,
           borderRadius: BorderRadius.circular(9),
       
         ),
         alignment: Alignment.center,
-        child: Text(buttonText,style: const TextStyle(
+        child: Text(buttonText,style: textStyle?? const TextStyle(
             fontSize: 16,fontWeight: FontWeight.w300,
             color: Colors.white
       

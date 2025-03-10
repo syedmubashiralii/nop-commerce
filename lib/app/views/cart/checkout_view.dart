@@ -8,6 +8,7 @@ import 'package:nop_commerce/app/utils/widgets/custom_button.dart';
 import 'package:nop_commerce/app/utils/widgets/custom_radio_button.dart';
 import 'package:nop_commerce/app/utils/widgets/edit_button.dart';
 import 'package:nop_commerce/app/views/cart/add_voucher_view.dart';
+import 'package:nop_commerce/app/views/cart/edit_shipping_address_view.dart';
 import 'package:nop_commerce/app/views/cart/widgets/contact_information_widget.dart';
 import 'package:nop_commerce/app/views/cart/widgets/shipping_address_widget.dart';
 import 'package:nop_commerce/app/views/settings/widgets/common_widgets.dart';
@@ -30,7 +31,9 @@ class CheckoutView extends StatelessWidget {
                   text: 'Payment',
                 ),
                 11.SpaceX,
-                const ShippingAddressWidget(),
+                 ShippingAddressWidget(onEdit: (){
+                  EditShippingAddressView().show();
+                },),
                 6.SpaceX,
                 const ContactInformationWidget(),
                 20.SpaceX,

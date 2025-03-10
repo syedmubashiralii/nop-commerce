@@ -1,10 +1,10 @@
   import 'package:flutter/material.dart';
-import 'package:nop_commerce/app/utils/color_helper.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
 import 'package:nop_commerce/app/utils/widgets/edit_button.dart';
 
 class ShippingAddressWidget extends StatelessWidget {
-  const ShippingAddressWidget({super.key});
+  final VoidCallback? onEdit;
+  const ShippingAddressWidget({super.key,this.onEdit});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class ShippingAddressWidget extends StatelessWidget {
               ],
             ),
           ),
-          EditButton()
+          EditButton(onTap: onEdit,)
         ],
       ),
     );
