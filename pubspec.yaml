@@ -99,6 +99,9 @@ flutter:
           weight: 600
         - asset: assets/fonts/Raleway-Bold.ttf
           weight: 700
+    - family: NunitoSans
+      fonts:
+        - asset: assets/fonts/NunitoSans.ttf      
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

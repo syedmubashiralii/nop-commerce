@@ -10,7 +10,7 @@ class ColorHelper {
   static const Color hintColor = Color(0xff9EB4E8);
   static const Color lightRed = Color(0xffF1AEAE);
   static const Color lightPink = Color(0xffFF5790);
-
+  static const Color buttonBlack=Color(0xff202020);
   static const Color lightContainer = Color(0xffE5EBFC);
   
 

@@ -5,6 +5,7 @@ import 'package:nop_commerce/app/utils/color_helper.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
 import 'package:nop_commerce/app/utils/widgets/custom_button.dart';
 import 'package:nop_commerce/app/views/cart/cart_item.dart';
+import 'package:nop_commerce/app/views/cart/checkout_view.dart';
 import 'package:nop_commerce/app/views/cart/widgets/shipping_address_widget.dart';
 import 'package:nop_commerce/app/views/settings/widgets/common_widgets.dart';
 import 'package:nop_commerce/app/views/wishlist/wishlist_item.dart';
@@ -87,7 +88,9 @@ class CartView extends StatelessWidget {
           SizedBox(
               height: 40,
               width: 128,
-              child: CustomButton(buttonText: 'Checkout')),
+              child: CustomButton(buttonText: 'Checkout',onTap: (){
+                Get.to(()=>CheckoutView());
+              },)),
         ],
       ),
     );
