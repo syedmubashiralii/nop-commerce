@@ -5,6 +5,7 @@ import 'package:nop_commerce/app/models/country_model.dart';
 import 'package:nop_commerce/app/utils/color_helper.dart';
 import 'package:nop_commerce/app/utils/custom_flash_widget.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
+import 'package:nop_commerce/app/utils/widgets/custom_radio_button.dart';
 import 'package:nop_commerce/app/views/settings/widgets/common_widgets.dart';
 
 class CurrencyView extends GetView<SettingsController> {
@@ -58,27 +59,7 @@ class CurrencyView extends GetView<SettingsController> {
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-                          Container(
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 2,
-                              ),
-                              color: isSelected
-                                  ? ColorHelper.blueColor
-                                  : Color(0xffF8CECE),
-                            ),
-                            child: isSelected
-                                ? const Icon(
-                                    Icons.check,
-                                    color: Colors.white,
-                                    size: 16,
-                                  )
-                                : null,
-                          ),
+                          CustomRadioButton(isSelected:isSelected)
                         ],
                       ),
                     ),

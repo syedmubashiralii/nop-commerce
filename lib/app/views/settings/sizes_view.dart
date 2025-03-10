@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:nop_commerce/app/controllers/settings_controller.dart';
 import 'package:nop_commerce/app/utils/color_helper.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
+import 'package:nop_commerce/app/utils/widgets/custom_radio_button.dart';
 import 'package:nop_commerce/app/views/settings/widgets/common_widgets.dart';
 
 class SizesView extends GetView<SettingsController> {
@@ -53,27 +54,7 @@ class SizesView extends GetView<SettingsController> {
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-                          Container(
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 2,
-                              ),
-                              color: isSelected
-                                  ? ColorHelper.blueColor
-                                  : Color(0xffF8CECE),
-                            ),
-                            child: isSelected
-                                ? const Icon(
-                                    Icons.check,
-                                    color: Colors.white,
-                                    size: 16,
-                                  )
-                                : null,
-                          ),
+                          CustomRadioButton(isSelected:isSelected)
                         ],
                       ),
                     ),

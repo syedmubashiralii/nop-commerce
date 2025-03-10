@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nop_commerce/app/controllers/cart_controller.dart';
 import 'package:nop_commerce/app/utils/color_helper.dart';
+import 'package:nop_commerce/app/utils/constants.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
 import 'package:nop_commerce/app/utils/widgets/custom_button.dart';
+import 'package:nop_commerce/app/utils/widgets/custom_radio_button.dart';
+import 'package:nop_commerce/app/utils/widgets/edit_button.dart';
 import 'package:nop_commerce/app/views/cart/widgets/contact_information_widget.dart';
 import 'package:nop_commerce/app/views/cart/widgets/shipping_address_widget.dart';
 import 'package:nop_commerce/app/views/settings/widgets/common_widgets.dart';
@@ -31,6 +34,28 @@ class CheckoutView extends StatelessWidget {
                 const ContactInformationWidget(),
                 20.SpaceX,
                 _itemsHeader(),
+                15.SpaceX,
+                _itemsList(),
+                16.SpaceX,
+                shippingOptionHeader(),
+                10.SpaceX,
+                shippingOptionsList(),
+                6.SpaceX,
+                shippingDateInfo(),
+                20.SpaceX,
+                paymentMethodHeader(),
+                11.SpaceX,
+                Container(
+                  height: 30,
+                  width: 90,
+                  padding: EdgeInsets.symmetric(horizontal: 18),
+                  decoration: BoxDecoration(color: Color(0xffE5EBFC),borderRadius: BorderRadius.circular(18)),
+                  alignment: Alignment.center,
+                  child: Text('Card',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 15,fontWeight: FontWeight.w700,color: ColorHelper.blueColor),),
+                )
+                
               ],
             ),
           ),
@@ -39,6 +64,134 @@ class CheckoutView extends StatelessWidget {
     );
   }
 
+
+  Widget paymentMethodHeader(){
+    return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Payment Method',
+                      style:
+                          TextStyle(fontSize: 21, fontWeight: FontWeight.w700),
+                    ),
+                    EditButton()
+                  ],
+                );
+  }
+
+  Widget shippingDateInfo() {
+    return Text(
+      'Delivered on or before Thursday, 23 April 2020',
+      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+    );
+  }
+
+  Widget shippingOptionsList() {
+    return Column(
+      children: controller.shippingOptions.map((data) {
+        return Obx(() {
+          bool isSelected =
+              data['name'] == controller.selectedShippingMethod.value;
+          return GestureDetector(
+            onTap: () => controller.selectedShippingMethod.value = data['name'],
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+              decoration: BoxDecoration(
+                color: isSelected ? Color(0xffE5EBFC) : const Color(0xffF9F9F9),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  CustomRadioButton(
+                    isSelected: isSelected,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    data['name'] ?? "Standard",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 72,
+                    height: 26,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                      color: isSelected ? Colors.white : Color(0xffF5F8FF),
+                    ),
+                    child: Text(
+                      data['deliveryTime'],
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: ColorHelper.blueColor,
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    data['price'] ?? 'FREE',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+      }).toList(),
+    );
+  }
+
+  Widget shippingOptionHeader() {
+    return const Text(
+      'Shipping Options',
+      style: TextStyle(fontSize: 21, fontWeight: FontWeight.w700),
+    );
+  }
+
+  Widget _itemsList() {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: 2,
+      itemBuilder: (context, index) {
+        return _itemContainer();
+      },
+    );
+  }
+
+  Widget _itemContainer() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          _itemAvatar(),
+          9.SpaceY,
+          const Expanded(
+            child: Text(
+              'Lorem ipsum dolor sit amet consectetur.',
+              maxLines: 2,
+              style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                  fontFamily: nunitoSans),
+            ),
+          ),
+          9.SpaceY,
+          const Text(
+            '\$17,00',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+          )
+        ],
+      ),
+    );
+  }
 
   Widget _itemAvatar() {
     return Stack(
@@ -64,17 +217,21 @@ class CheckoutView extends StatelessWidget {
           ),
         ),
         Positioned(
-          top: 1,
-          right: 1,
+          top: 2,
+          right: 0,
           child: Container(
-            width: 30,
-            height: 30,
+            width: 22,
+            height: 22,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: ColorHelper.lightContainer,
               border: Border.all(color: Colors.white, width: 2),
             ),
-            child: Text("1",style: TextStyle(fontSize: 13,fontWeight: FontWeight.w700),),
+            alignment: Alignment.center,
+            child: const Text(
+              "1",
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+            ),
           ),
         ),
       ],
@@ -117,7 +274,7 @@ class CheckoutView extends StatelessWidget {
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
                 color: ColorHelper.blueColor,
-                fontFamily: 'NunitoSans'),
+                fontFamily: nunitoSans),
           ),
         )
       ],

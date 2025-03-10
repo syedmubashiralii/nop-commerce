@@ -1,6 +1,7 @@
   import 'package:flutter/material.dart';
 import 'package:nop_commerce/app/utils/color_helper.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
+import 'package:nop_commerce/app/utils/widgets/edit_button.dart';
 
 class ShippingAddressWidget extends StatelessWidget {
   const ShippingAddressWidget({super.key});
@@ -33,14 +34,7 @@ class ShippingAddressWidget extends StatelessWidget {
               ],
             ),
           ),
-          const CircleAvatar(
-              radius: 15,
-              backgroundColor: ColorHelper.blueColor,
-              child: Icon(
-                Icons.edit_sharp,
-                color: Colors.white,
-                size: 18,
-              )),
+          EditButton()
         ],
       ),
     );
