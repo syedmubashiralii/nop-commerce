@@ -13,9 +13,10 @@ class AuthenticationController extends GetxController {
   var customerGuid = "".obs;
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
     _checkStoredToken();
+   
   }
 
   Future<void> _checkStoredToken() async {
@@ -24,12 +25,23 @@ class AuthenticationController extends GetxController {
       accessToken.value = Requests.box.read('access_token');
       customerGuid.value = Requests.box.read('customer_guid');
       print("Token Loaded from Storage: ${accessToken.value}");
+      checkToken();
     } else {
       authModel.value = await Requests.requestNewToken() ?? TokenModel();
       accessToken.value = authModel.value.accessToken ?? "";
       customerGuid.value = authModel.value.customerGuid ?? "";
     }
     getCurrentStoreInformation();
+  }
+
+  Future checkToken() async {
+    var response= await Requests.getDio(appUrl: 'https://mobiledemo.herohero.store/').get('token/check');
+    if(response.statusCode==200){
+      print("token check:${response.data}");
+    }
+    else{
+      _checkStoredToken();
+    }
   }
 
   Future<void> getCurrentStoreInformation() async {

@@ -24,18 +24,21 @@ class SubTitle extends StatelessWidget {
 
 class AppBarWidget extends StatelessWidget {
   final String text;
-  const AppBarWidget({super.key,required this.text});
+  final Widget? widget;
+  final MainAxisAlignment? mainAxisAlignment;
+  const AppBarWidget({super.key,required this.text,this.widget, this.mainAxisAlignment});
 
   @override
   Widget build(BuildContext context) {
     return   Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment:mainAxisAlignment?? MainAxisAlignment.spaceBetween,
       children: [
         Text(
           text,
-          style: TextStyle(
+          style: const TextStyle(
               color: Colors.black, fontSize: 28, fontWeight: FontWeight.w800),
         ),
+        widget??const SizedBox()
       ],
     );
   }

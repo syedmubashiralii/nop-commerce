@@ -14,3 +14,7 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+
+figma link:
+https://www.figma.com/design/lvlR3ICYsTmoMdiExPaJcR/Shoppe---eCommerce-Clothing-Fashion-Store-Multi-Purpose-UI-Mobile-App-Design-(Community)?node-id=0-7085&t=dM84KyfQiMD2QpeK-0

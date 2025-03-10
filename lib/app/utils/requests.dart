@@ -15,7 +15,7 @@ class Requests {
   static final box = GetStorage();
 
   static Dio getDio(
-      {Map<String, String>? headers, bool showLoadingDialog = true}) {
+      {Map<String, String>? headers, bool showLoadingDialog = true,String? appUrl}) {
     headers ??= {
       "Accept": "application/json",
       "Content-Type": "application/json",
@@ -23,14 +23,13 @@ class Requests {
     };
 
     BaseOptions options = BaseOptions(
-      baseUrl: baseUrl,
+      baseUrl:appUrl?? baseUrl,
       connectTimeout: const Duration(milliseconds: 30000),
       receiveTimeout: const Duration(milliseconds: 25000),
       validateStatus: (status) {
         if (status! == 401 || status == 403) {
           requestNewToken();
-          CustomFlashWidget.showFlashMessage(message: 
-              "Your app session has been expired. Please log in again!".tr);
+          
         }
         if (status == 502) {
           CustomFlashWidget.showFlashMessage(
@@ -104,5 +103,6 @@ class Requests {
       return null;
     }
   }
+
 
 }

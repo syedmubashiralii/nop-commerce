@@ -6,7 +6,7 @@ import 'package:nop_commerce/app/views/settings/country_list_view.dart';
 import 'package:nop_commerce/app/views/settings/currency_view.dart';
 import 'package:nop_commerce/app/views/settings/language_view.dart';
 import 'package:nop_commerce/app/views/settings/profile_view.dart';
-import 'package:nop_commerce/app/views/settings/shipping_address.dart';
+import 'package:nop_commerce/app/views/settings/shipping_address_view.dart';
 import 'package:nop_commerce/app/views/settings/sizes_view.dart';
 import 'package:nop_commerce/app/views/settings/widgets/common_widgets.dart';
 
@@ -58,13 +58,13 @@ class SettingsView extends StatelessWidget {
                   Get.to(CurrencyView());
                 });
               }),
-              22.SpaceX,
-              Obx(() {
-                return _item('Sizes', subValue: controller.selectedSize.value,
-                    onTap: () {
-                  Get.to(() => SizesView());
-                });
-              }),
+              // 22.SpaceX,
+              // Obx(() {
+              //   return _item('Sizes', subValue: controller.selectedSize.value,
+              //       onTap: () {
+              //     Get.to(() => SizesView());
+              //   });
+              // }),
               22.SpaceX,
               _item('Terms and Conditions'),
               31.SpaceX,
