@@ -1,0 +1,57 @@
+Required Page Numbers:
+ 2 - Create Account
+
+(3,4,5,6) Login Process
+
+(7,8,9) Password Reset
+
+10 - Message Box design
+
+15- (Main Application home) 
+ : Banner
+ : Categories -- Like Available in Page Number 25
+
+(for all 6 will be showed on page and on click of see all all the products will be seen)
+ : Banner
+ : New Products(marked as new)
+ : Advertising Categories as blocks (all sub categories of a category name advertisement)
+ : Banner
+ : Shop By Brands(manufacturers)
+ : Banner
+ : Feature Products
+ : Banner
+ : Best Seller products
+ : Banner
+ : Recently Viewed Products
+
+27- Showing All Categories
+
+28- Search Page
+
+34- Filter Page
+
+Product details page :(35,36,37) 
+-(35 :has Normal price, 36 :has Sale price and normal price, 37 :Colors/ size / Options selection)
+- Onscroll we will have 
+*Product spesification - Like Page 56
+*Long description
+*Reviews
+*Related products
+*Cross sell product
+*Recently viewed products
+
+
+39- Wishlist , with navigation to recently viewed products 
+44- shopping cart with items
+45- Empty Shopping cart
+47- Checkout screen payment (same screen will have mayment methods)
+48- when clicked on add voucher
+49- After Adding voucher
+50- Shipping address / Billing address
+(53, 54, 55) -Has payment messages
+57- My Orders Status Page
+(59, 60, 61)- Order Tracking Page
+64- Customer Activity
+(65, 66, 67)- for review
+82- Voucher Screen
+(86, 87, 88, 94,95,96,97,98 )- Settings page
