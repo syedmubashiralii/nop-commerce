@@ -1,27 +1,123 @@
+import 'dart:developer';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:nop_commerce/app/controllers/home_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:nop_commerce/app/models/product_model.dart';
+import 'package:nop_commerce/app/services/recently_viewed_service.dart';
 import 'package:nop_commerce/app/utils/color_helper.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
+import 'package:nop_commerce/app/utils/widgets/custom_button.dart';
+import 'package:nop_commerce/app/utils/widgets/custom_text_field.dart';
 
-class ProductDetailView extends StatelessWidget {
+class ProductDetailView extends StatefulWidget {
   ProductDetailView({super.key});
 
+  @override
+  State<ProductDetailView> createState() => _ProductDetailViewState();
+}
+
+class _ProductDetailViewState extends State<ProductDetailView> {
   final HomeController homeController = Get.find();
+
+  bool isInit = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-          child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [_productImage(), 20.SpaceX, _productDetails()],
+    if (!isInit) {
+      final product = homeController.selectedProduct.value;
+      if (product.id != null) {
+        RecentlyViewedService.addProduct(product);
+        isInit = true;
+      }
+    }
+    log(homeController.selectedProduct.value.toJson().toString());
+    return SafeArea(
+      child: Scaffold(
+        bottomNavigationBar: _buildBottomBar(),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [_productImage(), 20.SpaceX, _productDetails()],
+          ),
         ),
-      )),
+      ),
+    );
+  }
+
+  Widget _buildBottomBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      decoration: const BoxDecoration(),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+              decoration: BoxDecoration(
+                  color: const Color(0xffF9F9F9),
+                  borderRadius: BorderRadius.circular(12)),
+              height: 40,
+              width: 47,
+              child: IconButton(
+                  onPressed: () {
+                    homeController.addToCart(
+                        homeController.selectedProduct.value.id ?? 0,
+                        homeController.selectedProduct.toJson(),
+                        _buildSelectedAttributes(),
+                        addToWishList: true,
+                        indexToNavigate: 1,
+                        quantity: homeController
+                                .selectedProduct.value.orderMinimumQuantity ??
+                            1);
+                  },
+                  icon: const Icon(CupertinoIcons.heart))),
+          const Spacer(),
+          SizedBox(
+              height: 40,
+              width: 128,
+              child: CustomButton(
+                onTap: () {
+                  print(_buildSelectedAttributes());
+                  homeController.addToCart(
+                      homeController.selectedProduct.value.id ?? 0,
+                      homeController.selectedProduct.toJson(),
+                      _buildSelectedAttributes(),
+                      indexToNavigate: 3,
+                      quantity: homeController
+                              .selectedProduct.value.orderMinimumQuantity ??
+                          1);
+                },
+                buttonText: 'Add to Cart',
+                buttonColor: ColorHelper.buttonBlack,
+              )),
+          16.SpaceY,
+          SizedBox(
+              height: 40,
+              width: 128,
+              child: CustomButton(
+                onTap: () {
+                  // homeController.buyNow(
+                  //     homeController.selectedProduct.value.id ?? 0,
+                  //     _buildSelectedAttributes());
+                  homeController.addToCart(
+                      homeController.selectedProduct.value.id ?? 0,
+                      homeController.selectedProduct.toJson(),
+                      _buildSelectedAttributes(),
+                      indexToNavigate: 3,
+                      quantity: homeController
+                              .selectedProduct.value.orderMinimumQuantity ??
+                          1);
+                },
+                buttonText: 'Buy Now',
+                buttonColor: ColorHelper.blueColor,
+              )),
+        ],
+      ),
     );
   }
 
@@ -34,7 +130,6 @@ class ProductDetailView extends StatelessWidget {
         autoPlayAnimationDuration: const Duration(milliseconds: 1500),
         autoPlayInterval: const Duration(seconds: 7),
         onPageChanged: (index, _) {},
-        // enlargeCenterPage: true,
         autoPlay: true,
       ),
       items: homeController.selectedProduct.value.images?.map((i) {
@@ -58,6 +153,10 @@ class ProductDetailView extends StatelessWidget {
   }
 
   Widget _productDetails() {
+    final product = homeController.selectedProduct.value;
+    final tags = product.tags ?? [];
+    var attributes = product.attributes ?? [];
+    print(attributes.toSet().toString());
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Column(
@@ -73,8 +172,7 @@ class ProductDetailView extends StatelessWidget {
                   ),
                   children: [
                 TextSpan(
-                  text:
-                      "${homeController.selectedProduct.value.price?.toStringAsFixed(2)}",
+                  text: "${product.price?.toStringAsFixed(2)}",
                   style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
@@ -84,25 +182,203 @@ class ProductDetailView extends StatelessWidget {
               ])),
           6.SpaceX,
           Text(
-            (homeController.selectedProduct.value.name ?? "").capitalizeFirst ??
-                "",
+            (product.name ?? "").capitalizeFirst ?? "",
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           3.SpaceX,
+          Text(
+            '${product.approvedTotalReviews ?? ""} Reviews',
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+          ),
+          if ((product.orderMinimumQuantity ?? 0) > 1) 3.SpaceX,
+          if ((product.orderMinimumQuantity ?? 0) > 1)
+            Text(
+              'Please note: A minimum order quantity of ${product.orderMinimumQuantity} is required.',
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+                color: Colors.redAccent,
+              ),
+            ),
+          3.SpaceX,
           const Divider(),
           3.SpaceX,
+          Html(data: product.fullDescription ?? ""),
+          3.SpaceX,
           Text(
-            homeController.selectedProduct.value.fullDescription ?? "",
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+            'SKU: ${product.sku ?? ""}',
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
           ),
           3.SpaceX,
-          // Text(
-          //   homeController.selectedProduct.value.manufacturerIds?[0].toString() ?? "",
-          //   style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
-          // ),
-
+          Text(
+            'Availability: ${product.displayStockAvailability == true ? "InStock" : "Out of Stock" ?? ""}',
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+          ),
+          5.SpaceX,
+          if (attributes.isNotEmpty) _buildAttributeFields(attributes),
+          3.SpaceX,
+          if (tags.isNotEmpty) _productTags(tags),
         ],
       ),
     );
+  }
+
+  Widget _productTags(List<String> tags) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Product Tags",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        Wrap(
+          spacing: 6,
+          children: tags
+              .map((tag) => Chip(
+                    color: const WidgetStatePropertyAll(Colors.white),
+                    label: Text(tag),
+                    backgroundColor: ColorHelper.blueColor.withOpacity(0.1),
+                    labelStyle: const TextStyle(color: Colors.black),
+                  ))
+              .toList(),
+        ),
+      ],
+    );
+  }
+
+  List<Map<String, dynamic>> _buildSelectedAttributes() {
+    List<Map<String, dynamic>> selectedAttributes = [];
+
+    final product = homeController.selectedProduct.value;
+    var attributes = product.attributes ?? [];
+
+    for (var attr in attributes) {
+      // Get the selected attribute value
+      var selectedValue = attr.attributeValues
+          ?.firstWhereOrNull((v) => v.isPreSelected == true);
+
+      if (selectedValue != null) {
+        selectedAttributes.add({
+          "value": selectedValue.id.toString(), // 👈 Use ID as string
+          "id": attr.id,
+        });
+      } else if (attr.defaultValue != null) {
+        selectedAttributes.add({
+          "value": attr.defaultValue.toString(),
+          "id": attr.id,
+        });
+      }
+    }
+
+    return selectedAttributes;
+  }
+
+  Widget _buildAttributeFields(List<Attributes> attributes) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: attributes.map((attr) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (attr.textPrompt != null)
+              Text(
+                attr.textPrompt!,
+                style:
+                    const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+              ),
+            6.SpaceX,
+            Text(attr.productAttributeName ?? "",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            5.SpaceX,
+            _buildControl(attr),
+            6.SpaceX,
+          ],
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildControl(Attributes attr) {
+    switch (attr.attributeControlTypeId) {
+      case 1:
+        return DropdownButtonFormField<String>(
+          value: attr.attributeValues
+              ?.firstWhereOrNull((v) => v.isPreSelected == true)
+              ?.name,
+          items: attr.attributeValues?.map((v) {
+            return DropdownMenuItem<String>(
+              value: v.name,
+              child: Text(v.name ?? ""),
+            );
+          }).toList(),
+          dropdownColor: Colors.white,
+          onChanged: (value) {
+            attr.attributeValues?.forEach((val) {
+              val.isPreSelected = (val.name == value);
+            });
+            homeController.selectedProduct.refresh();
+            setState(() {});
+          },
+          decoration: InputDecoration(
+            focusColor: ColorHelper.blueColor,
+            border: OutlineInputBorder(
+                borderSide: BorderSide(color: ColorHelper.blueColor)),
+            focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: ColorHelper.blueColor)),
+            hintText: "Select ${attr.productAttributeName}",
+          ),
+        );
+      case 2:
+        return Column(
+          children: attr.attributeValues?.map((v) {
+                return RadioListTile<String>(
+                  fillColor: WidgetStatePropertyAll(ColorHelper.blueColor),
+                  activeColor: ColorHelper.blueColor,
+                  value: v.name ?? "",
+                  groupValue: attr.attributeValues
+                      ?.firstWhereOrNull((e) => e.isPreSelected == true)
+                      ?.name,
+                  onChanged: (val) {
+                    attr.attributeValues?.forEach((element) {
+                      element.isPreSelected = (element.name == val);
+                    });
+                    homeController.selectedProduct.refresh();
+                    setState(() {});
+                  },
+                  title: Text(v.name ?? ""),
+                );
+              }).toList() ??
+              [],
+        );
+      case 3:
+        return Column(
+          children: attr.attributeValues?.map((v) {
+                return CheckboxListTile(
+                  activeColor: ColorHelper.blueColor,
+                  value: v.isPreSelected ?? false,
+                  onChanged: (val) {
+                    v.isPreSelected = val ?? false;
+                    homeController.selectedProduct.refresh();
+                    setState(() {});
+                  },
+                  title: Text(v.name ?? ""),
+                );
+              }).toList() ??
+              [],
+        );
+      case 4:
+        return CustomTextField(
+          controller: TextEditingController(
+            text: attr.defaultValue?.toString() ?? "",
+          ),
+          onChanged: (value) {
+            attr.defaultValue = value;
+            homeController.selectedProduct.refresh();
+            setState(() {});
+          },
+        );
+      default:
+        return const Text("Unsupported input type");
+    }
   }
 }

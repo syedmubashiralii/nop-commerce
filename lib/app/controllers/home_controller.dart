@@ -8,8 +8,11 @@ import 'package:nop_commerce/app/controllers/authentication_controller.dart';
 import 'package:nop_commerce/app/models/category_model.dart';
 import 'package:nop_commerce/app/models/product_model.dart';
 import 'package:nop_commerce/app/models/token_model.dart';
+import 'package:nop_commerce/app/routes/app_pages.dart';
+import 'package:nop_commerce/app/services/cart_services.dart';
 import 'package:nop_commerce/app/services/category_service.dart';
 import 'package:nop_commerce/app/services/product_service.dart';
+import 'package:nop_commerce/app/utils/custom_flash_widget.dart';
 import 'package:nop_commerce/app/utils/requests.dart';
 import 'package:nop_commerce/app/views/shop/all_categories_view.dart';
 import 'package:nop_commerce/app/views/shop/category_products_view.dart';
@@ -20,6 +23,7 @@ class HomeController extends GetxController {
   var authenticationController = Get.find<AuthenticationController>();
   String get selectedCurrency =>
       authenticationController.stores[0].currencies[0].currencyCode;
+  var selectedAttributes = RxMap<int, dynamic>();
 
   @override
   Future<void> onInit() async {
@@ -36,6 +40,11 @@ class HomeController extends GetxController {
   var selectedIndex = 0.obs;
 
   void changeIndex(int index) {
+    if (index == -1) return;
+    if (Get.currentRoute != Routes.HOME) {
+      Get.offNamed(Routes.HOME);
+    }
+
     selectedIndex.value = index;
   }
 
@@ -128,5 +137,19 @@ class HomeController extends GetxController {
     } catch (e) {
       print(e.toString());
     } finally {}
+  }
+
+  /// add to cart
+  Future<void> addToCart(int id, Map product, var productAttibutes,
+      {bool addToWishList = false,
+      int indexToNavigate = -1,
+      int quantity = 1}) async {
+    CartServices cartServices = CartServices();
+    var response = await cartServices.addProductToCart(
+        id, product, productAttibutes,
+        addToWishList: addToWishList, quantity: quantity);
+    if (response.statusCode == 200) {
+      changeIndex(indexToNavigate);
+    }
   }
 }

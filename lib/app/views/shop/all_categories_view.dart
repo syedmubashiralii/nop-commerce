@@ -5,6 +5,7 @@ import 'package:nop_commerce/app/models/category_model.dart';
 import 'package:nop_commerce/app/utils/color_helper.dart';
 import 'package:nop_commerce/app/utils/custom_flash_widget.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
+import 'package:nop_commerce/app/utils/widgets/custom_bottom_bar.dart';
 import 'package:nop_commerce/app/views/shop/category_products_view.dart';
 
 class AllCategoriesView extends StatelessWidget {
@@ -16,6 +17,7 @@ class AllCategoriesView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      bottomNavigationBar: CustomBottomBar(controller: homeController),
       floatingActionButton: _fab(),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -55,8 +57,7 @@ class AllCategoriesView extends StatelessWidget {
             : selectedCategory.id!;
 
         await homeController.fetchCategoryProductList(id);
-        Get.to(()=>CategoryProductsView());
-
+        Get.to(() => CategoryProductsView());
       },
       child: const CircleAvatar(
         backgroundColor: ColorHelper.blueColor,
@@ -198,9 +199,8 @@ class AllCategoriesView extends StatelessWidget {
                   homeController.selectedSubCategory.value.id == subcategory.id;
               return InkWell(
                 onTap: () {
-                  if(isSelected)
-                  {
-                    homeController.selectedSubCategory.value=CategoryModel();
+                  if (isSelected) {
+                    homeController.selectedSubCategory.value = CategoryModel();
                     return;
                   }
                   homeController.selectedSubCategory.value = subcategory;

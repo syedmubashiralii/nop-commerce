@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:nop_commerce/app/models/store_model.dart';
 import 'package:nop_commerce/app/models/token_model.dart';
 import 'package:nop_commerce/app/utils/requests.dart';
@@ -11,37 +12,51 @@ class AuthenticationController extends GetxController {
   var stores = <StoreModel>[].obs;
   var accessToken = "".obs;
   var customerGuid = "".obs;
+  var customerId = 0.obs;
 
   @override
   Future<void> onInit() async {
     super.onInit();
     _checkStoredToken();
-   
   }
 
   Future<void> _checkStoredToken() async {
-    if (Requests.box.hasData('access_token') &&
-        Requests.box.hasData('customer_guid')) {
-      accessToken.value = Requests.box.read('access_token');
-      customerGuid.value = Requests.box.read('customer_guid');
-      print("Token Loaded from Storage: ${accessToken.value}");
-      checkToken();
+    final hasToken = Requests.box.hasData('access_token');
+    final hasGuid = Requests.box.hasData('customer_guid');
+    final hasId = Requests.box.hasData('customer_id');
+
+    if (hasToken && hasGuid && hasId) {
+      accessToken.value = Requests.box.read('access_token') ?? "";
+      customerGuid.value = Requests.box.read('customer_guid') ?? "";
+      customerId.value = Requests.box.read('customer_id') ?? 0;
+
+      print("✅ Token loaded from storage: ${accessToken.value}");
+
+      final tokenIsValid = await Requests.checkToken();
+      if (!tokenIsValid) {
+        print("⚠️ Stored token invalid, requesting new token...");
+        await _requestAndStoreNewToken();
+      }
     } else {
-      authModel.value = await Requests.requestNewToken() ?? TokenModel();
-      accessToken.value = authModel.value.accessToken ?? "";
-      customerGuid.value = authModel.value.customerGuid ?? "";
+      print("🔑 No stored token found, requesting new token...");
+      await _requestAndStoreNewToken();
     }
+
     getCurrentStoreInformation();
   }
 
-  Future checkToken() async {
-    var response= await Requests.getDio(appUrl: 'https://mobiledemo.herohero.store/').get('token/check');
-    if(response.statusCode==200){
-      print("token check:${response.data}");
-    }
-    else{
-      _checkStoredToken();
-    }
+  Future<void> _requestAndStoreNewToken() async {
+    authModel.value = await Requests.requestNewToken() ?? TokenModel();
+    accessToken.value = authModel.value.accessToken ?? "";
+    customerGuid.value = authModel.value.customerGuid ?? "";
+    customerId.value = authModel.value.customerId ?? 0;
+
+    // Optional: Save back to storage if needed
+    Requests.box.write('access_token', accessToken.value);
+    Requests.box.write('customer_guid', customerGuid.value);
+    Requests.box.write('customer_id', customerId.value);
+
+    print("✅ New token fetched and stored.");
   }
 
   Future<void> getCurrentStoreInformation() async {

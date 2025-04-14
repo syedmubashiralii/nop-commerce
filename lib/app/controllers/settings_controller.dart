@@ -1,17 +1,24 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:nop_commerce/app/controllers/authentication_controller.dart';
 import 'package:nop_commerce/app/models/country_model.dart';
 import 'package:nop_commerce/app/models/store_model.dart';
+import 'package:nop_commerce/app/services/settings_services.dart';
+import 'package:nop_commerce/app/utils/custom_flash_widget.dart';
 import 'package:nop_commerce/app/utils/requests.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class SettingsController extends GetxController {
   List<String> sizes = ['US', 'EU', 'UK'];
   AuthenticationController authenticationController = Get.find();
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
   var packageInfo = Rx<PackageInfo?>(null);
   Rx<String> formattedDate = ''.obs;
   RxList<CountryModel> countryList = <CountryModel>[].obs;
@@ -24,7 +31,7 @@ class SettingsController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
     _initPackageInfo();
-   
+
     fetchCurrentCustomer();
   }
 
@@ -52,9 +59,40 @@ class SettingsController extends GetxController {
     if (response.statusCode == 200) {}
   }
 
-  Future setCustomerData({required Map data}) async {
-    var response = await Requests.getDio().post('customers', data: data);
-    log(response.data.toString());
-    if (response.statusCode == 200) {}
-  }
+  Future<void> setCustomerData() async {
+    final firstName = firstNameController.text.trim();
+    final lastName = lastNameController.text.trim();
+    final email = emailController.text.trim();
+
+    if (firstName.isEmpty) {
+      CustomFlashWidget.showFlashMessage(message: "First name is required");
+      return;
+    }
+
+    if (lastName.isEmpty) {
+      CustomFlashWidget.showFlashMessage(message: "Last name is required");
+      return;
+    }
+
+    if (email.isEmpty) {
+      CustomFlashWidget.showFlashMessage(message: "Email is required");
+      return;
+    }
+    final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
+    if (!emailRegex.hasMatch(email)) {
+      CustomFlashWidget.showFlashMessage(
+          message: "Please enter a valid email address");
+      return;
+    }
+
+    await SettingsServices().createCustomer(payload: {
+      "customer": {
+        "guid": Requests.box.read('customer_guid'),
+        "first_name": firstName,
+        "last_name": lastName,
+        "email": email
+      }
+    });
+    fetchCurrentCustomer();  
+    }
 }

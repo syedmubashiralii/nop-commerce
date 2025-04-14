@@ -6,6 +6,7 @@ import 'package:nop_commerce/app/controllers/home_controller.dart';
 import 'package:nop_commerce/app/models/product_model.dart';
 import 'package:nop_commerce/app/utils/color_helper.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
+import 'package:nop_commerce/app/utils/widgets/custom_bottom_bar.dart';
 import 'package:nop_commerce/app/views/shop/product_detail_view.dart';
 
 class CategoryProductsView extends StatelessWidget {
@@ -16,6 +17,7 @@ class CategoryProductsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: CustomBottomBar(controller: homeController),
       body: SafeArea(
           child: SingleChildScrollView(
         child: Padding(
@@ -83,7 +85,7 @@ class CategoryProductsView extends StatelessWidget {
           crossAxisCount: Get.width > 600 ? 3 : 2,
           crossAxisSpacing: 8,
           mainAxisSpacing: 4,
-          childAspectRatio: 0.68,
+          childAspectRatio: 0.75,
         ),
         itemBuilder: (context, index) {
           final products = homeController.categoryProductList.toList();
@@ -159,37 +161,43 @@ class CategoryProductsView extends StatelessWidget {
                   ),
                 )
               ])),
-          6.SpaceX,
-          Row(
-            children: [
-              Container(
-                height: 40,
-                width: 128,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(12)),
-                child: const Text(
-                  'Add To Cart',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: ColorHelper.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w300),
-                ),
-              ),
-              const Spacer(),
-              Container(
-                height: 40,
-                width: 47,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: const Color(0xffF9F9F9)),
-                child: const Icon(CupertinoIcons.heart),
-              ),
-              3.SpaceY,
-            ],
-          )
+          // 6.SpaceX,
+          // Row(
+          //   children: [
+          //     InkWell(
+          //       onTap: () {
+          //         homeController.addToCart(product.id??0,product.toJson());
+          //       },
+          //       child: Container(
+          //         height: 40,
+          //         width: 128,
+          //         alignment: Alignment.center,
+          //         decoration: BoxDecoration(
+          //             color: Colors.black,
+          //             borderRadius: BorderRadius.circular(12)),
+          //         child: const Text(
+          //           'Add To Cart',
+          //           textAlign: TextAlign.center,
+          //           style: TextStyle(
+          //               color: ColorHelper.white,
+          //               fontSize: 16,
+          //               fontWeight: FontWeight.w300),
+          //         ),
+          //       ),
+          //     ),
+          //     const Spacer(),
+          //     Container(
+          //       height: 40,
+          //       width: 47,
+          //       decoration: BoxDecoration(
+          //           borderRadius: BorderRadius.circular(12),
+          //           color: const Color(0xffF9F9F9)),
+          //       child: const Icon(CupertinoIcons.heart),
+          //     ),
+          //     3.SpaceY,
+          //   ],
+          // )
+       
         ],
       ),
     );

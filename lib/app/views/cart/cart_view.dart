@@ -14,6 +14,7 @@ class CartView extends StatelessWidget {
   CartController controller = Get.put(CartController());
   @override
   Widget build(BuildContext context) {
+    controller.getShoppingCart();
     return Scaffold(
       bottomNavigationBar: _buildCheckoutBar(),
       body: SafeArea(
@@ -34,22 +35,32 @@ class CartView extends StatelessWidget {
                     decoration: const BoxDecoration(
                         color: ColorHelper.lightContainer,
                         shape: BoxShape.circle),
-                    child: const Text(
-                      '2',
-                      style:
-                          TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
-                    ),
+                    child: Obx(() {
+                      return Text(
+                        controller.shoppingCartCount.value.toString(),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w700, fontSize: 18),
+                      );
+                    }),
                   ),
                 ),
                 7.SpaceX,
-                ShippingAddressWidget(),
+                const ShippingAddressWidget(),
                 const SizedBox(height: 16),
-                Column(
-                  children: [
-                    CartItem(index: 0),
-                    CartItem(index: 1),
-                    CartItem(index: 2),
-                  ],
+                Obx(
+                  () {
+                    return Column(
+                      children: controller.shoppingCartModel.value.shoppingCarts
+                              ?.map((cartItem) {
+                            return CartItem(
+                                index: controller
+                                    .shoppingCartModel.value.shoppingCarts!
+                                    .indexOf(cartItem),
+                                cartItem: cartItem);
+                          }).toList() ??
+                          [],
+                    );
+                  }
                 ),
                 21.SpaceX,
                 const Text(
@@ -57,7 +68,7 @@ class CartView extends StatelessWidget {
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
                 ),
                 16.SpaceX,
-                Column(
+                const Column(
                   children: [
                     WishlistItem(index: 0),
                     WishlistItem(index: 1),
@@ -88,9 +99,12 @@ class CartView extends StatelessWidget {
           SizedBox(
               height: 40,
               width: 128,
-              child: CustomButton(buttonText: 'Checkout',onTap: (){
-                Get.to(()=>CheckoutView());
-              },)),
+              child: CustomButton(
+                buttonText: 'Checkout',
+                onTap: () {
+                  Get.to(() => CheckoutView());
+                },
+              )),
         ],
       ),
     );

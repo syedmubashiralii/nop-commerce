@@ -10,6 +10,8 @@ import 'package:nop_commerce/app/utils/color_helper.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
 import 'package:nop_commerce/app/views/shop/all_categories_view.dart';
 import 'package:nop_commerce/app/views/shop/product_detail_view.dart';
+import 'package:nop_commerce/app/views/shop/see_all_products_view.dart';
+import 'package:nop_commerce/app/views/shop/widgets/product_card.dart';
 
 class ShopView extends StatelessWidget {
   final HomeController controller = Get.find<HomeController>();
@@ -33,7 +35,15 @@ class ShopView extends StatelessWidget {
                 10.SpaceX,
                 _allCategories(),
                 10.SpaceX,
-                _header('All Items', () {}),
+                Obx(() {
+                  return _header('All Items', () {
+                    Get.to(SeeAllProductsView());
+                  },
+                      showSeeAll: controller.productList
+                              .where((p) => p.showOnHomePage == true)
+                              .length >
+                          6);
+                }),
                 10.SpaceX,
                 _allItemsGrid()
               ],
@@ -56,81 +66,79 @@ class ShopView extends StatelessWidget {
     );
   }
 
-
-Widget _buildSlider() {
-  return Column(
-        children: [
-            CarouselSlider(
-              options: CarouselOptions(
-                height: 130,
-                autoPlay: true,
-                enlargeCenterPage: true,
-                viewportFraction: 1,
-                onPageChanged: (index, reason) {
-                  controller.currentPage.value = index;
-                },
-              ),
-              items: List.generate(4, (index) {
-                return Container(
-                  decoration: BoxDecoration(
-                     borderRadius: BorderRadius.circular(15),
-                color: Colors.amber,
-                    image: const DecorationImage(
-                      image: AssetImage('assets/images/big_sale.png'),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  width: Get.width,
-                  child: const Padding(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 12,horizontal: 16 ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Big Sale',
-                            style: TextStyle(
-                                fontSize: 29,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white)),
-                        SizedBox(height: 4),
-                        Text('Up to 50%',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white)),
-                        SizedBox(height: 4),
-                        Text('Happening Now',
-                            style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white)),
-                      ],
-                    ),
-                  ),
-                );
-              }),
-            ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(4, (index) {
-              return Obx(() => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: controller.currentPage.value == index ? 40 : 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: controller.currentPage.value == index
-                          ? ColorHelper.blueColor
-                          : ColorHelper.blueColor.withOpacity(.2),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                  ));
-            }),
+  Widget _buildSlider() {
+    return Column(
+      children: [
+        CarouselSlider(
+          options: CarouselOptions(
+            height: 130,
+            autoPlay: true,
+            enlargeCenterPage: true,
+            viewportFraction: 1,
+            onPageChanged: (index, reason) {
+              controller.currentPage.value = index;
+            },
           ),
-        ],
-  );
-}
+          items: List.generate(4, (index) {
+            return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.amber,
+                image: const DecorationImage(
+                  image: AssetImage('assets/images/big_sale.png'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              width: Get.width,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Big Sale',
+                        style: TextStyle(
+                            fontSize: 29,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white)),
+                    SizedBox(height: 4),
+                    Text('Up to 50%',
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white)),
+                    SizedBox(height: 4),
+                    Text('Happening Now',
+                        style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white)),
+                  ],
+                ),
+              ),
+            );
+          }),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(4, (index) {
+            return Obx(() => Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: controller.currentPage.value == index ? 40 : 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: controller.currentPage.value == index
+                        ? ColorHelper.blueColor
+                        : ColorHelper.blueColor.withOpacity(.2),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ));
+          }),
+        ),
+      ],
+    );
+  }
 
   Widget _allCategories() {
     return Obx(
@@ -197,7 +205,7 @@ Widget _buildSlider() {
     );
   }
 
-  Widget _header(String title, VoidCallback onTap) {
+  Widget _header(String title, VoidCallback onTap, {bool showSeeAll = true}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -209,17 +217,18 @@ Widget _buildSlider() {
             color: Colors.black,
           ),
         ),
-        TextButton(
-          onPressed: onTap,
-          child: const Text(
-            "See All",
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: ColorHelper.blueColor,
+        if (showSeeAll)
+          TextButton(
+            onPressed: onTap,
+            child: const Text(
+              "See All",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: ColorHelper.blueColor,
+              ),
             ),
-          ),
-        )
+          )
       ],
     );
   }
@@ -230,8 +239,13 @@ Widget _buildSlider() {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: controller.productList
-            .where((p) => p.showOnHomePage == true)
-            .length,
+                    .where((p) => p.showOnHomePage == true)
+                    .length >
+                6
+            ? 6
+            : controller.productList
+                .where((p) => p.showOnHomePage == true)
+                .length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: Get.width > 600 ? 3 : 2,
           crossAxisSpacing: 8,
@@ -243,79 +257,10 @@ Widget _buildSlider() {
               .where((p) => p.showOnHomePage == true)
               .toList();
           final product = products[index];
-          return _productCard(product);
+          return ProductCard(
+            product: product,
+          );
         },
-      ),
-    );
-  }
-
-  Widget _productCard(Products product) {
-    return InkWell(
-      onTap: () {
-        controller.selectedProduct.value = product;
-        Get.to(() => ProductDetailView());
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 181,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(9),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  spreadRadius: 0,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.all(5),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(6),
-                  image: DecorationImage(
-                    image: CachedNetworkImageProvider(
-                      product.images != null ? product.images!.first.src! : '',
-                    ),
-                    fit: BoxFit.cover,
-                  )),
-            ),
-          ),
-          6.SpaceX,
-          Text(
-            product.name ?? '',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              color: Colors.black,
-            ),
-          ),
-          1.SpaceX,
-          RichText(
-              text: TextSpan(
-                  text: "${controller.selectedCurrency}",
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                  ),
-                  children: [
-                TextSpan(
-                  text: "${product.price?.toStringAsFixed(2)}",
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black,
-                  ),
-                )
-              ]))
-        ],
       ),
     );
   }

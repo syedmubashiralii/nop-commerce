@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio/src/response.dart' as DioResponse;
@@ -15,7 +17,9 @@ class Requests {
   static final box = GetStorage();
 
   static Dio getDio(
-      {Map<String, String>? headers, bool showLoadingDialog = true,String? appUrl}) {
+      {Map<String, String>? headers,
+      bool showLoadingDialog = true,
+      String? appUrl}) {
     headers ??= {
       "Accept": "application/json",
       "Content-Type": "application/json",
@@ -23,19 +27,18 @@ class Requests {
     };
 
     BaseOptions options = BaseOptions(
-      baseUrl:appUrl?? baseUrl,
+      baseUrl: appUrl ?? baseUrl,
       connectTimeout: const Duration(milliseconds: 30000),
       receiveTimeout: const Duration(milliseconds: 25000),
       validateStatus: (status) {
         if (status! == 401 || status == 403) {
           requestNewToken();
-          
         }
         if (status == 502) {
           CustomFlashWidget.showFlashMessage(
-              message:  "Please try again later!".tr);
+              message: "Please try again later!".tr);
         }
-         if (!(Get.isDialogOpen ?? false) && showLoadingDialog) {
+        if (!(Get.isDialogOpen ?? false) && showLoadingDialog) {
           Get.dialog(const LoadingDialog());
         }
         return status <= 500;
@@ -48,7 +51,7 @@ class Requests {
     d.interceptors.add(InterceptorsWrapper(
       onRequest:
           (RequestOptions options, RequestInterceptorHandler handler) async {
-        print(options.path);
+        log("${baseUrl}${options.path}");
         if (!(Get.isDialogOpen ?? false) && showLoadingDialog) {
           Get.dialog(const LoadingDialog());
         }
@@ -62,6 +65,7 @@ class Requests {
         if (kDebugMode && response.statusCode != 200) {
           print(response.data);
         }
+        //  log(response.data.toString());
         return handler.next(response); // continue
       },
       onError: (DioError e, ErrorInterceptorHandler handler) async {
@@ -77,7 +81,6 @@ class Requests {
 
     return d;
   }
-
 
   static Future<TokenModel?> requestNewToken() async {
     try {
@@ -96,13 +99,50 @@ class Requests {
         TokenModel tokenModel = TokenModel.fromJson(data);
         box.write('access_token', tokenModel.accessToken);
         box.write('customer_guid', tokenModel.customerGuid);
+        box.write('customer_id', tokenModel.customerId);
         return tokenModel;
       }
     } catch (e) {
       print('Error fetching new token: $e');
       return null;
     }
+    return null;
   }
 
+  static Future<bool> checkToken() async {
+    final String? token = box.read("access_token");
 
+    if (token == null || token.isEmpty) {
+      print("No access token found.");
+      return false;
+    }
+
+    final Dio gdio = Dio(
+      BaseOptions(
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+      ),
+    );
+
+    try {
+      final response =
+          await gdio.get('https://mobiledemo.herohero.store/token/check');
+
+      if (response.statusCode == 200) {
+        print("✅ Token valid: ${response.data}");
+        return true;
+      } else {
+        print("❌ Token check failed: ${response.statusCode}");
+        return false;
+      }
+    } catch (e) {
+      print("⚠️ Error checking token: $e");
+      return false;
+    }
+  }
 }

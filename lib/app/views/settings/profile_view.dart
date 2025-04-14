@@ -13,13 +13,6 @@ import 'package:nop_commerce/app/views/settings/widgets/common_widgets.dart';
 class ProfileView extends GetView<SettingsController> {
   ProfileView({super.key});
 
-  final TextEditingController nameController =
-      TextEditingController(text: "Romina");
-  final TextEditingController emailController =
-      TextEditingController(text: "gmail@example.com");
-  final TextEditingController passwordController =
-      TextEditingController(text: "**********");
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,21 +30,17 @@ class ProfileView extends GetView<SettingsController> {
             18.SpaceX,
             _profilePicture(),
             20.SpaceX,
-            CustomTextField(controller: nameController),
+            CustomTextField(controller: controller.firstNameController,hintText: 'john',),
             10.SpaceX,
-            CustomTextField(controller: emailController),
+            CustomTextField(controller: controller.lastNameController,hintText: 'doe',),
             10.SpaceX,
-            CustomTextField(controller: passwordController, obscureText: true),
+            CustomTextField(controller: controller.emailController,hintText: 'john.doe@example.com',),
+            10.SpaceX,
+            CustomTextField(controller: controller.passwordController, obscureText: true,hintText: "**********",),
             Spacer(),
             InkWell(
                 onTap: () async {
-                  // await controller.setCustomerData(data: {
-                  //   "customer": {
-                  //     'guid': Requests.box.read('customer_guid'),
-                  //     "first_name": "<string>",
-                  //     "last_name": "<string>",
-                  //   }
-                  // });
+                  await controller.setCustomerData();
                 },
                 child: CustomButton(
                   buttonText: 'Save Changes',

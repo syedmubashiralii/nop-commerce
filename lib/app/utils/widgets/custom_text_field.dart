@@ -7,6 +7,7 @@ class CustomTextField extends StatelessWidget {
   final bool obscureText;
   final String? label;
   final String? hintText;
+  final void Function(String)? onChanged;
 
   const CustomTextField({
     Key? key,
@@ -14,6 +15,7 @@ class CustomTextField extends StatelessWidget {
     this.obscureText = false,
     this.label ,
     this.hintText ,
+    this.onChanged
   }) : super(key: key);
 
   @override
@@ -22,17 +24,17 @@ class CustomTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if(label!=null)
-        Text(label??"",style: TextStyle(fontSize: 13,fontWeight: FontWeight.w600,color: Colors.black),),
+        Text(label??"",style: const TextStyle(fontSize: 13,fontWeight: FontWeight.w600,color: Colors.black),),
         1.SpaceX,
         TextField(
           controller: controller,
           obscureText: obscureText,
-          style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.w500),
+          style: const TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.w500),
           decoration: InputDecoration(
             filled: true,
             fillColor: const Color(0xffF1F4FE),
             hintText: hintText??"",
-            hintStyle: TextStyle(color: ColorHelper.hintColor,fontSize: 16,fontWeight: FontWeight.w500),
+            hintStyle: const TextStyle(color: ColorHelper.hintColor,fontSize: 16,fontWeight: FontWeight.w500),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide.none,

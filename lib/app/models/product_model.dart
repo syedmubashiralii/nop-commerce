@@ -502,7 +502,7 @@ class Images {
   int? pictureId;
   int? position;
   String? src;
-  Null? attachment;
+  var attachment;
 
   Images({this.id, this.pictureId, this.position, this.src, this.attachment});
 
@@ -532,7 +532,7 @@ class Attributes {
   bool? isRequired;
   int? attributeControlTypeId;
   int? displayOrder;
-  Null? defaultValue;
+  var defaultValue;
   String? attributeControlTypeName;
   List<AttributeValues>? attributeValues;
   int? id;
@@ -598,7 +598,7 @@ class AttributeValues {
   int? quantity;
   bool? isPreSelected;
   int? displayOrder;
-  Null? productImageId;
+  var productImageId;
   String? type;
   int? id;
 
@@ -661,7 +661,7 @@ class AttributeValues {
 
 class ImageSquaresImage {
   String? src;
-  Null? attachment;
+  var attachment;
 
   ImageSquaresImage({this.src, this.attachment});
 
@@ -682,12 +682,12 @@ class ProductSpecificationAttributes {
   int? productId;
   int? attributeTypeId;
   int? specificationAttributeOptionId;
-  Null? customValue;
+  var customValue;
   bool? allowFiltering;
   bool? showOnProductPage;
   int? displayOrder;
   String? attributeType;
-  Null? specificationAttributeOption;
+  var specificationAttributeOption;
   int? id;
 
   ProductSpecificationAttributes(
