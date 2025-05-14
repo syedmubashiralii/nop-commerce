@@ -98,7 +98,7 @@ class EditShippingAddressView extends StatelessWidget {
   Widget _chooseCountry() {
     return InkWell(
       onTap: () {
-        Get.to(() => CountryListView());
+        Get.to(() => CountryListView(shouldUpdate: false,));
       },
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

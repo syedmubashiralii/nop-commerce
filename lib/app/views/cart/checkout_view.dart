@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nop_commerce/app/controllers/cart_controller.dart';
+import 'package:nop_commerce/app/controllers/home_controller.dart';
+import 'package:nop_commerce/app/models/cart_model.dart';
 import 'package:nop_commerce/app/utils/color_helper.dart';
 import 'package:nop_commerce/app/utils/constants.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
@@ -17,40 +19,42 @@ class CheckoutView extends StatelessWidget {
   CartController controller = Get.find();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: _buildCheckoutBar(),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const AppBarWidget(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  text: 'Payment',
-                ),
-                11.SpaceX,
-                 ShippingAddressWidget(onEdit: (){
-                  EditShippingAddressView().show();
-                },),
-                6.SpaceX,
-                const ContactInformationWidget(),
-                20.SpaceX,
-                _itemsHeader(onAddVoucher: ()=>AddVoucherView().show()),
-                15.SpaceX,
-                _itemsList(),
-                16.SpaceX,
-                shippingOptionHeader(),
-                10.SpaceX,
-                shippingOptionsList(),
-                6.SpaceX,
-                shippingDateInfo(),
-                20.SpaceX,
-                paymentMethodHeader(),
-                11.SpaceX,
-                selectedPaymentMethod()
-              ],
+    return SafeArea(
+      child: Scaffold(
+        bottomNavigationBar: _buildCheckoutBar(),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const AppBarWidget(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    text: 'Payment',
+                  ),
+                  11.SpaceX,
+                   ShippingAddressWidget(onEdit: (){
+                    EditShippingAddressView().show();
+                  },),
+                  6.SpaceX,
+                  const ContactInformationWidget(),
+                  20.SpaceX,
+                  _itemsHeader(onAddVoucher: ()=>AddVoucherView().show()),
+                  15.SpaceX,
+                  _itemsList(),
+                  16.SpaceX,
+                  shippingOptionHeader(),
+                  10.SpaceX,
+                  shippingOptionsList(),
+                  6.SpaceX,
+                  shippingDateInfo(),
+                  20.SpaceX,
+                  paymentMethodHeader(),
+                  11.SpaceX,
+                  selectedPaymentMethod()
+                ],
+              ),
             ),
           ),
         ),
@@ -171,44 +175,64 @@ class CheckoutView extends StatelessWidget {
     );
   }
 
-  Widget _itemsList() {
+ Widget _itemsList() {
+
+  return Obx(() {
+    final shoppingCarts = controller.shoppingCartModel.value.shoppingCarts ?? [];
+
+    if (shoppingCarts.isEmpty) {
+      return const Center(child: Text('Cart is empty'));
+    }
+
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: 2,
+      physics: const NeverScrollableScrollPhysics(), // because it’s inside another scroll
+      itemCount: shoppingCarts.length,
       itemBuilder: (context, index) {
-        return _itemContainer();
+        final cartItem = shoppingCarts[index];
+        return _itemContainer(cartItem);
       },
     );
-  }
+  });
+}
 
-  Widget _itemContainer() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          _itemAvatar(),
-          9.SpaceY,
-          const Expanded(
-            child: Text(
-              'Lorem ipsum dolor sit amet consectetur.',
-              maxLines: 2,
-              style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  fontFamily: nunitoSans),
+Widget _itemContainer(ShoppingCarts cartItem) {
+  final selectedCurrency = Get.find<HomeController>().selectedCurrencySymbol;
+  final product = cartItem.product;
+
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Row(
+      children: [
+        _itemAvatar(product?.images?.isNotEmpty == true ? product!.images![0].src : null,cartItem.quantity??0),
+        9.SpaceY,
+        Expanded(
+          child: Text(
+            product?.name ?? 'Product Name',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              fontFamily: nunitoSans,
             ),
           ),
-          9.SpaceY,
-          const Text(
-            '\$17,00',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
-          )
-        ],
-      ),
-    );
-  }
+        ),
+        9.SpaceY,
+        Text(
+          "${selectedCurrency}${product?.price ?? 0}",
+          style: const TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 18,
+          ),
+        )
+      ],
+    ),
+  );
+}
 
-  Widget _itemAvatar() {
+
+  Widget _itemAvatar(String? imageUrl,int quantity) {
     return Stack(
       children: [
         Container(
@@ -225,8 +249,8 @@ class CheckoutView extends StatelessWidget {
                 offset: const Offset(0, 0),
               ),
             ],
-            image: const DecorationImage(
-              image: NetworkImage("https://i.pravatar.cc/150?img=5"),
+            image:  DecorationImage(
+              image: NetworkImage(imageUrl??""),
               fit: BoxFit.cover,
             ),
           ),
@@ -243,8 +267,8 @@ class CheckoutView extends StatelessWidget {
               border: Border.all(color: Colors.white, width: 2),
             ),
             alignment: Alignment.center,
-            child: const Text(
-              "1",
+            child:  Text(
+             quantity.toString(),
               style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
             ),
           ),
@@ -271,9 +295,14 @@ class CheckoutView extends StatelessWidget {
               alignment: Alignment.center,
               decoration: const BoxDecoration(
                   color: ColorHelper.lightContainer, shape: BoxShape.circle),
-              child: const Text(
-                '2',
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+              child: Obx(
+                () {
+                  final shoppingCarts = controller.shoppingCartModel.value.shoppingCarts ?? [];
+                  return  Text(
+                    shoppingCarts.length.toString(),
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+                  );
+                }
               ),
             ),
           ],
@@ -300,6 +329,7 @@ class CheckoutView extends StatelessWidget {
   }
 
   Widget _buildCheckoutBar() {
+    String selectedCurrency = Get.find<HomeController>().selectedCurrencySymbol;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       decoration: const BoxDecoration(
@@ -308,9 +338,28 @@ class CheckoutView extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
-            'Total \$34.00',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+          Row(
+            children: [
+              const Text(
+                'Total: ',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+              ),
+              Text(
+                  "$selectedCurrency ",
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.w400),
+                ),
+                Text(
+                  (controller.shoppingCartModel.value.shoppingCarts?.fold(
+                              0.0,
+                              (sum, cart) =>
+                                  sum + ((cart.product?.price ?? 0) * (cart.quantity ?? 1))) ??
+                          0.0)
+                      .toStringAsFixed(2),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w700),
+                ),
+            ],
           ),
           SizedBox(
               height: 40,

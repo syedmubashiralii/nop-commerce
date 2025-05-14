@@ -6,7 +6,8 @@ import 'package:nop_commerce/app/utils/extensions.dart';
 import 'package:nop_commerce/app/views/settings/widgets/common_widgets.dart';
 
 class CountryListView extends GetView<SettingsController> {
-  CountryListView({super.key});
+  bool shouldUpdate = false;
+  CountryListView({super.key,required this.shouldUpdate});
 
   final TextEditingController searchController = TextEditingController();
 
@@ -72,8 +73,12 @@ class CountryListView extends GetView<SettingsController> {
                             padding: const EdgeInsets.symmetric(
                                 vertical: 6, horizontal: 16),
                             child: GestureDetector(
-                              onTap: (){
+                              onTap: () async {
                                 controller.selectedCountry.value=country.name;
+                                controller.selectedCountryID.value=country.id;
+                                if(shouldUpdate){
+                                //  await controller.updateCustomerCountry();
+                                }
                                 Get.back();
                               },
                               child: SizedBox(

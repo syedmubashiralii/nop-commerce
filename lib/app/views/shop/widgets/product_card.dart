@@ -43,7 +43,7 @@ class ProductCard extends GetView<HomeController> {
                     image: CachedNetworkImageProvider(
                       product.images != null ? product.images!.first.src! : '',
                     ),
-                    fit: BoxFit.cover,
+                    fit: BoxFit.cover
                   )),
             ),
           ),

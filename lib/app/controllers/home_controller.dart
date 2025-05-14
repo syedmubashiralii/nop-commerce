@@ -23,6 +23,7 @@ class HomeController extends GetxController {
   var authenticationController = Get.find<AuthenticationController>();
   String get selectedCurrency =>
       authenticationController.stores[0].currencies[0].currencyCode;
+  String get selectedCurrencySymbol => selectedCurrency=="KWD"?"د.ك":"\$";      
   var selectedAttributes = RxMap<int, dynamic>();
 
   @override
@@ -141,13 +142,27 @@ class HomeController extends GetxController {
 
   /// add to cart
   Future<void> addToCart(int id, Map product, var productAttibutes,
-      {bool addToWishList = false,
+      {
       int indexToNavigate = -1,
       int quantity = 1}) async {
     CartServices cartServices = CartServices();
     var response = await cartServices.addProductToCart(
+        id, product, productAttibutes, quantity: quantity);
+    if (response.statusCode == 200) {
+      changeIndex(indexToNavigate);
+    }
+  }
+
+
+
+  Future<void> addToWishList(int id, Map product, var productAttibutes,
+      {
+      int indexToNavigate = -1,
+      int quantity = 1}) async {
+    CartServices cartServices = CartServices();
+    var response = await cartServices.addProductToWishList(
         id, product, productAttibutes,
-        addToWishList: addToWishList, quantity: quantity);
+        quantity: quantity);
     if (response.statusCode == 200) {
       changeIndex(indexToNavigate);
     }

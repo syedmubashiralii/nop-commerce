@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:nop_commerce/app/models/store_model.dart';
 import 'package:nop_commerce/app/models/token_model.dart';
 import 'package:nop_commerce/app/utils/requests.dart';
@@ -17,10 +16,10 @@ class AuthenticationController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
-    _checkStoredToken();
+    checkStoredToken();
   }
 
-  Future<void> _checkStoredToken() async {
+  Future<void> checkStoredToken() async {
     final hasToken = Requests.box.hasData('access_token');
     final hasGuid = Requests.box.hasData('customer_guid');
     final hasId = Requests.box.hasData('customer_id');
@@ -82,5 +81,17 @@ class AuthenticationController extends GetxController {
     } catch (e) {
       log("Error fetching store information: $e");
     }
+  }
+
+  Future<void> clearDataAndLogout() async{
+    authModel.value = TokenModel();
+    accessToken.value = "";
+    customerGuid.value = "";
+    customerId.value = 0;
+    Future.wait([
+      Requests.box.remove('access_token'),
+      Requests.box.remove('customer_guid'),
+      Requests.box.remove('customer_id')
+    ]);
   }
 }

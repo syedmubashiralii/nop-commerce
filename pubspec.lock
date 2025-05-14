@@ -337,6 +337,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.15.0"
+  myfatoorah_flutter:
+    dependency: "direct main"
+    description:
+      name: myfatoorah_flutter
+      sha256: "8aef676103c7cae2b8b644a624395cc31fa16eb7c044f0d106144adc60bc5983"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.5"
   octo_image:
     dependency: transitive
     description:

@@ -1,16 +1,18 @@
 import 'package:get/get.dart';
 import 'package:nop_commerce/app/models/cart_model.dart';
 import 'package:nop_commerce/app/services/cart_services.dart';
+import 'package:nop_commerce/app/services/order_services.dart';
 
 class CartController extends GetxController {
   RxString selectedShippingMethod = 'Standard'.obs;
   CartServices cartServices = CartServices();
   Rx<CartModel> shoppingCartModel = CartModel(shoppingCarts: []).obs;
   RxInt shoppingCartCount = 0.obs;
+  OrderServices orderServices = OrderServices();
 
   @override
   onReady() {
-    getShoppingCart();
+    // getShoppingCart();
   }
 
   RxList shippingOptions = [
@@ -29,7 +31,8 @@ class CartController extends GetxController {
               return CartModel(shoppingCarts: filteredCarts);
             }) ??
             CartModel(shoppingCarts: []);
-    // print('shopping cart model: ${shoppingCartModel.value.toJson()}');
+    print(
+        'shopping cart model length: ${shoppingCartModel.value.shoppingCarts?.length}');
     shoppingCartModel.refresh();
     if (shoppingCartModel.value.shoppingCarts != null) {
       shoppingCartCount.value =
@@ -38,15 +41,22 @@ class CartController extends GetxController {
     }
   }
 
-  void updateProductQuantity(
-      int id, int productId, int quantity) async {
+  void updateProductQuantity(int id, int productId, int quantity) async {
     await cartServices.updateProductQuantity(id, productId, quantity);
     getShoppingCart();
   }
 
-  void addToCart(int productId, Map product) async {
-    await cartServices.addProductToCart(productId, product, null);
-    getShoppingCart();
+  // void addToCart(int productId, Map product) async {
+  //   await cartServices.addProductToCart(productId, product, null);
+  //   getShoppingCart();
+  // }
+
+  Future<void> createOrder() async {
+    var response = await orderServices.createOrder(
+        shoppingCartModel.value.shoppingCarts
+            ?.map((va) => va.toJson())
+            .toList(),
+        0);
   }
 
   void removeFromCart(int productId) async {

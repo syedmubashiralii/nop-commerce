@@ -82,14 +82,14 @@ class Requests {
     return d;
   }
 
-  static Future<TokenModel?> requestNewToken() async {
+  static Future<TokenModel?> requestNewToken({bool? isGuest=true,String? username="",String? password=""}) async {
     try {
       final response = await dio.post(
         'https://mobiledemo.herohero.store/token',
         data: {
-          "guest": "true",
-          "username": "",
-          "password": "",
+          "guest": isGuest,
+          "username": username,
+          "password": password,
           "remember_me": "true",
         },
       );
@@ -110,7 +110,7 @@ class Requests {
   }
 
   static Future<bool> checkToken() async {
-    final String? token = box.read("access_token");
+     String? token = box.read("access_token");
 
     if (token == null || token.isEmpty) {
       print("No access token found.");

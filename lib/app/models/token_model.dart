@@ -4,6 +4,7 @@ class TokenModel {
   String? createdAtUtc;
   String? expiresAtUtc;
   int? customerId;
+  String? username;
   String? customerGuid;
 
   TokenModel({
@@ -11,6 +12,7 @@ class TokenModel {
     this.tokenType,
     this.createdAtUtc,
     this.expiresAtUtc,
+    this.username,
     this.customerId,
     this.customerGuid,
   });
@@ -20,6 +22,7 @@ class TokenModel {
       accessToken: json["access_token"],
       tokenType: json["token_type"],
       createdAtUtc: json["created_at_utc"],
+      username: json['username'],
       expiresAtUtc: json["expires_at_utc"],
       customerId: json["customer_id"],
       customerGuid: json["customer_guid"],

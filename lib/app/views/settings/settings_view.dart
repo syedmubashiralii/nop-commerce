@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nop_commerce/app/controllers/settings_controller.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
-import 'package:nop_commerce/app/views/settings/country_list_view.dart';
 import 'package:nop_commerce/app/views/settings/currency_view.dart';
 import 'package:nop_commerce/app/views/settings/language_view.dart';
 import 'package:nop_commerce/app/views/settings/profile_view.dart';
 import 'package:nop_commerce/app/views/settings/shipping_address_view.dart';
-import 'package:nop_commerce/app/views/settings/sizes_view.dart';
 import 'package:nop_commerce/app/views/settings/widgets/common_widgets.dart';
 
 class SettingsView extends StatelessWidget {
@@ -25,7 +23,7 @@ class SettingsView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppBarWidget(
+              const AppBarWidget(
                 text: 'Settings',
               ),
               27.SpaceX,
@@ -36,24 +34,25 @@ class SettingsView extends StatelessWidget {
               }),
               25.SpaceX,
               _item('Shipping Address', onTap: () {
-                Get.to(() => ShippingAddressView());
+                Get.to(() => const ShippingAddressView());
               }),
               // 25.SpaceX,
               // _item('Payment methods'),
               31.SpaceX,
               _subTitle('Shop'),
-              33.SpaceX,
-              Obx(
-                 () {
-                  return _item('Country', subValue: controller.selectedCountry.value, onTap: () {
-                    Get.to(() => CountryListView());
-                  });
-                }
-              ),
+              // 33.SpaceX,
+              // Obx(
+              //    () {
+              //     return _item('Country', subValue: controller.selectedCountry.value, onTap: () {
+              //       Get.to(() => CountryListView(shouldUpdate: true,));
+              //     });
+              //   }
+              // ),
+              
               22.SpaceX,
               Obx(() {
                 return _item('Currency',
-                    subValue: '${controller.selectedCurrency.value}',
+                    subValue: controller.selectedCurrency.value,
                     onTap: () {
                   Get.to(CurrencyView());
                 });

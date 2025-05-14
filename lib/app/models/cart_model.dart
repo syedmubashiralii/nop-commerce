@@ -15,17 +15,17 @@ class CartModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data =  Map<String, dynamic>();
-    if (this.shoppingCarts != null) {
+    final Map<String, dynamic> data =  <String, dynamic>{};
+    if (shoppingCarts != null) {
       data['shopping_carts'] =
-          this.shoppingCarts!.map((v) => v.toJson()).toList();
+          shoppingCarts!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class ShoppingCarts {
-  List? productAttributes;
+  List<ProductAttribute>? productAttributes;
   var customerEnteredPrice;
   int? quantity;
   var rentalStartDateUtc;
@@ -56,7 +56,7 @@ class ShoppingCarts {
     if (json['product_attributes'] != null) {
       productAttributes = [];
       json['product_attributes'].forEach((v) {
-        productAttributes!.add( '');
+        productAttributes!.add(ProductAttribute.fromMap(v));
       });
     }
     customerEnteredPrice = json['customer_entered_price'];
@@ -74,25 +74,45 @@ class ShoppingCarts {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data =  Map<String, dynamic>();
-    if (this.productAttributes != null) {
+    final Map<String, dynamic> data =  <String, dynamic>{};
+    if (productAttributes != null) {
       data['product_attributes'] =
-          this.productAttributes!.map((v) => v.toJson()).toList();
+          productAttributes!.map((v) => v.toJson()).toList();
     }
-    data['customer_entered_price'] = this.customerEnteredPrice;
-    data['quantity'] = this.quantity;
-    data['rental_start_date_utc'] = this.rentalStartDateUtc;
-    data['rental_end_date_utc'] = this.rentalEndDateUtc;
-    data['created_on_utc'] = this.createdOnUtc;
-    data['updated_on_utc'] = this.updatedOnUtc;
-    data['shopping_cart_type'] = this.shoppingCartType;
-    data['product_id'] = this.productId;
-    if (this.product != null) {
-      data['product'] = this.product!.toJson();
+    data['customer_entered_price'] = customerEnteredPrice;
+    data['quantity'] = quantity;
+    data['rental_start_date_utc'] = rentalStartDateUtc;
+    data['rental_end_date_utc'] = rentalEndDateUtc;
+    data['created_on_utc'] = createdOnUtc;
+    data['updated_on_utc'] = updatedOnUtc;
+    data['shopping_cart_type'] = shoppingCartType;
+    data['product_id'] = productId;
+    if (product != null) {
+      data['product'] = product!.toJson();
     }
-    data['customer_id'] = this.customerId;
-    data['id'] = this.id;
+    data['customer_id'] = customerId;
+    data['id'] = id;
     return data;
   }
 }
 
+class ProductAttribute {
+  int id;
+  String value;
+
+  ProductAttribute({required this.id, required this.value});
+
+  factory ProductAttribute.fromMap(Map<String, dynamic> map) {
+    return ProductAttribute(
+      id: map['id'],
+      value: map['value'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'value': value,
+    };
+  }
+}

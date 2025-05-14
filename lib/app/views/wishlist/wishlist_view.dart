@@ -10,7 +10,7 @@ import 'package:nop_commerce/app/utils/extensions.dart';
 import 'package:nop_commerce/app/views/settings/widgets/common_widgets.dart';
 import 'package:nop_commerce/app/views/shop/product_detail_view.dart';
 import 'package:nop_commerce/app/views/wishlist/recently_viewed_items_view.dart';
-import 'package:nop_commerce/app/views/wishlist/wishlist_item.dart';
+import 'package:nop_commerce/app/views/wishlist/widgets/wishlist_item.dart';
 
 class WishlistView extends StatelessWidget {
   WishlistView({super.key});
@@ -47,13 +47,15 @@ class WishlistView extends StatelessWidget {
                       (controller.wishlistModel.value.shoppingCarts?.length ??
                                   0) ==
                               0
-                          ? Center(child: const Text("No data in wishlist"))
+                          ? const Center(child: Text("No data in wishlist"))
                           : ListView.builder(
                               itemCount: controller.wishlistModel.value
                                       .shoppingCarts?.length ??
                                   0,
                               itemBuilder: (context, index) =>
-                                  WishlistItem(index: index),
+                                  WishlistItem(index: index,
+                                      cartItem: controller.wishlistModel.value
+                                          .shoppingCarts![index]),
                             )),
                 ),
               ),
@@ -125,10 +127,10 @@ class WishlistView extends StatelessWidget {
           onTap: () {
             Get.to(() => RecentlyViewedItemsView());
           },
-          child: CircleAvatar(
+          child: const CircleAvatar(
             radius: 15,
             backgroundColor: ColorHelper.blueColor,
-            child: const Icon(
+            child: Icon(
               Icons.arrow_forward_sharp,
               color: Colors.white,
               size: 20,

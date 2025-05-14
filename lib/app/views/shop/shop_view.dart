@@ -1,15 +1,10 @@
-import 'dart:developer';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nop_commerce/app/controllers/home_controller.dart';
-import 'package:nop_commerce/app/models/product_model.dart';
 import 'package:nop_commerce/app/utils/color_helper.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
 import 'package:nop_commerce/app/views/shop/all_categories_view.dart';
-import 'package:nop_commerce/app/views/shop/product_detail_view.dart';
 import 'package:nop_commerce/app/views/shop/see_all_products_view.dart';
 import 'package:nop_commerce/app/views/shop/widgets/product_card.dart';
 
@@ -21,11 +16,17 @@ class ShopView extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: RefreshIndicator(
+            backgroundColor: Colors.white,
+            color: ColorHelper.blueColor,
+            onRefresh: () async {
+              await controller.fetchCategories();
+              await controller.fetchProductList();
+            },
+            child: ListView(
+              // crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _appBar(),
                 19.SpaceX,
@@ -37,7 +38,7 @@ class ShopView extends StatelessWidget {
                 10.SpaceX,
                 Obx(() {
                   return _header('All Items', () {
-                    Get.to(SeeAllProductsView());
+                    Get.to(const SeeAllProductsView());
                   },
                       showSeeAll: controller.productList
                               .where((p) => p.showOnHomePage == true)

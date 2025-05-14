@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
@@ -24,7 +25,6 @@ class ProductDetailView extends StatefulWidget {
 
 class _ProductDetailViewState extends State<ProductDetailView> {
   final HomeController homeController = Get.find();
-
   bool isInit = false;
 
   @override
@@ -65,11 +65,10 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               width: 47,
               child: IconButton(
                   onPressed: () {
-                    homeController.addToCart(
+                    homeController.addToWishList(
                         homeController.selectedProduct.value.id ?? 0,
                         homeController.selectedProduct.toJson(),
                         _buildSelectedAttributes(),
-                        addToWishList: true,
                         indexToNavigate: 1,
                         quantity: homeController
                                 .selectedProduct.value.orderMinimumQuantity ??
@@ -82,7 +81,9 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               width: 128,
               child: CustomButton(
                 onTap: () {
-                  print(_buildSelectedAttributes());
+                  if (kDebugMode) {
+                    print(_buildSelectedAttributes());
+                  }
                   homeController.addToCart(
                       homeController.selectedProduct.value.id ?? 0,
                       homeController.selectedProduct.toJson(),
@@ -156,7 +157,6 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     final product = homeController.selectedProduct.value;
     final tags = product.tags ?? [];
     var attributes = product.attributes ?? [];
-    print(attributes.toSet().toString());
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Column(
@@ -164,7 +164,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         children: [
           RichText(
               text: TextSpan(
-                  text: "${homeController.selectedCurrency}",
+                  text: homeController.selectedCurrency,
                   style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
@@ -188,7 +188,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           3.SpaceX,
           Text(
             '${product.approvedTotalReviews ?? ""} Reviews',
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
           ),
           if ((product.orderMinimumQuantity ?? 0) > 1) 3.SpaceX,
           if ((product.orderMinimumQuantity ?? 0) > 1)
@@ -207,12 +207,12 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           3.SpaceX,
           Text(
             'SKU: ${product.sku ?? ""}',
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
           ),
           3.SpaceX,
           Text(
             'Availability: ${product.displayStockAvailability == true ? "InStock" : "Out of Stock" ?? ""}',
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
           ),
           5.SpaceX,
           if (attributes.isNotEmpty) _buildAttributeFields(attributes),
@@ -259,7 +259,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
       if (selectedValue != null) {
         selectedAttributes.add({
-          "value": selectedValue.id.toString(), // 👈 Use ID as string
+          "value": selectedValue.id.toString(),
           "id": attr.id,
         });
       } else if (attr.defaultValue != null) {
@@ -288,7 +288,8 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               ),
             6.SpaceX,
             Text(attr.productAttributeName ?? "",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             5.SpaceX,
             _buildControl(attr),
             6.SpaceX,
@@ -321,9 +322,9 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           },
           decoration: InputDecoration(
             focusColor: ColorHelper.blueColor,
-            border: OutlineInputBorder(
+            border: const OutlineInputBorder(
                 borderSide: BorderSide(color: ColorHelper.blueColor)),
-            focusedBorder: OutlineInputBorder(
+            focusedBorder: const OutlineInputBorder(
                 borderSide: BorderSide(color: ColorHelper.blueColor)),
             hintText: "Select ${attr.productAttributeName}",
           ),
@@ -332,7 +333,8 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         return Column(
           children: attr.attributeValues?.map((v) {
                 return RadioListTile<String>(
-                  fillColor: WidgetStatePropertyAll(ColorHelper.blueColor),
+                  fillColor:
+                      const WidgetStatePropertyAll(ColorHelper.blueColor),
                   activeColor: ColorHelper.blueColor,
                   value: v.name ?? "",
                   groupValue: attr.attributeValues
@@ -377,8 +379,101 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             setState(() {});
           },
         );
+
+      case 45:
+        // 🆕 ImageSquares case (newly added)
+        return Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: attr.attributeValues?.map((v) {
+                bool isSelected = v.isPreSelected ?? false;
+                return GestureDetector(
+                  onTap: () {
+                    attr.attributeValues?.forEach((val) {
+                      val.isPreSelected = false;
+                    });
+                    v.isPreSelected = true;
+                    homeController.selectedProduct.refresh();
+                    setState(() {});
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: isSelected
+                            ? ColorHelper.blueColor
+                            : Colors.grey.shade300,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.all(6),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CachedNetworkImage(
+                          imageUrl: v.imageSquaresImage?.src ?? '',
+                          height: 80,
+                          width: 80,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) =>
+                              const CircularProgressIndicator(),
+                        ),
+                        6.SpaceX,
+                        Text(
+                          v.name ?? '',
+                          style: TextStyle(
+                            color: isSelected
+                                ? ColorHelper.blueColor
+                                : Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList() ??
+              [],
+        );
+      case 40:
+        return Wrap(
+          spacing: 8,
+          children: attr.attributeValues?.map((value) {
+                return GestureDetector(
+                  onTap: () {
+                    attr.attributeValues?.forEach((val) {
+                      val.isPreSelected = false;
+                    });
+                    value.isPreSelected = true;
+                    homeController.selectedProduct.refresh();
+                    setState(() {});
+                  },
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: _hexToColor(value.colorSquaresRgb ?? ""),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: value.isPreSelected == true
+                            ? ColorHelper.blueColor
+                            : Colors.grey,
+                        width: value.isPreSelected == true ? 3 : 1,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList() ??
+              [],
+        );
+
       default:
         return const Text("Unsupported input type");
     }
+  }
+
+  Color _hexToColor(String hex) {
+    hex = hex.replaceFirst('#', '');
+    if (hex.length == 6) hex = 'FF$hex';
+    return Color(int.parse(hex, radix: 16));
   }
 }

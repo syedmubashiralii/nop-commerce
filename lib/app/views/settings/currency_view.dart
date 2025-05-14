@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nop_commerce/app/controllers/settings_controller.dart';
-import 'package:nop_commerce/app/models/country_model.dart';
-import 'package:nop_commerce/app/utils/color_helper.dart';
-import 'package:nop_commerce/app/utils/custom_flash_widget.dart';
 import 'package:nop_commerce/app/utils/extensions.dart';
 import 'package:nop_commerce/app/utils/widgets/custom_radio_button.dart';
 import 'package:nop_commerce/app/views/settings/widgets/common_widgets.dart';
@@ -39,6 +36,9 @@ class CurrencyView extends GetView<SettingsController> {
                   return GestureDetector(
                     onTap: () {
                       controller.selectedCurrency.value = currency.currencyCode;
+                      controller.selectedCurrencyID.value =
+                          currency.id;
+                      controller.updateCustomerCurrency();    
                     },
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 10),
@@ -46,7 +46,7 @@ class CurrencyView extends GetView<SettingsController> {
                           vertical: 14, horizontal: 16),
                       decoration: BoxDecoration(
                         color:
-                            isSelected ? Color(0xffE5EBFC) : Color(0xffF9F9F9),
+                            isSelected ? const Color(0xffE5EBFC) : const Color(0xffF9F9F9),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
